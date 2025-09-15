@@ -5,4 +5,5 @@
 5. create cameracar Klasse -> open
 6. live bild -> Berechnung Lenkwinkel (label) -> save the picture (welche Bilder matcht welche winkel) -> open
 (jpg, int), Bild01_winkel_90.jpg, -> list = string.split("_")[-1]
-7. collect the pictures-> open
+7. how could we calculate the angel based on the live picture??
+8. collect the pictures-> open

@@ -4,15 +4,34 @@ from basisklassen_cam import Camera
 import time
 import json
 import numpy as np
+import matplotlib.pylab as plt
+import cv2
 
 class CameraCar(BaseCar):
 
-    def __init__(self, front, back, ultra, infra, values_to_log=["get_distance", "get_ir"]):
+    def __init__(self, front, back, camera, values_to_log):
         super().__init__(front, back, values_to_log)
-        self.infra = infra
-        self.ultra = ultra
-        self.ir_config()
-        self.analog=[]
-        self.digital=[]
-        print("SensorCar erzeugt")
-    pass
+        self.camera = camera
+        self.picture_collect()
+        print("CameraCar erzeugt")
+
+    def picture_collect(self):
+        img = self.camera.get_frame()
+        self.camera.release()
+        cv2.imwrite("Bild.jpg", img)
+        print(img)
+
+#main()
+
+front = FrontWheels()
+back = BackWheels()
+cam = Camera(devicenumber = 0,
+            buffersize = 10,
+            skip_frame = 0,
+            height = 480,
+            width = 640,
+            flip = True,
+            colorspace = 'rgb')
+
+
+cam_car = CameraCar(front,back,cam, [])
