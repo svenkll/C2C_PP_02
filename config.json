@@ -2,6 +2,6 @@
     "turning_offset": 0,
     "forward_A": 0,
     "forward_B": 0,
-    "ir_ref": []
+    "ir_ref": [170,170,170,170,170]
 }
  
