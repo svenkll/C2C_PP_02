@@ -1,5 +1,8 @@
-1. understaning of basisklassen_cam -> erledigt
+1. understaning of basisklassen_cam -> down
 2. on the ground-> two traces/lanes with blue color
 3. test camera with own methode and test with OpenCV -> Demo_camera.ipynb
-4. create cameracar -> open
-4. collect the pictures-> open
+4. Dashboard -> open 
+5. create cameracar Klasse -> open
+6. live bild -> Berechnung Lenkwinkel (label) -> save the picture (welche Bilder matcht welche winkel) -> open
+(jpg, int), Bild01_winkel_90.jpg, -> list = string.split("_")[-1]
+7. collect the pictures-> open
