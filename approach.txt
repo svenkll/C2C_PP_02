@@ -1,4 +1,4 @@
-1. understaning of basisklassen_cam -> down
+1. understaning of basisklassen_cam -> done
 2. on the ground-> two traces/lanes with blue color
 3. test camera with own methode and test with OpenCV -> Demo_camera.ipynb
 4. Dashboard -> open 
