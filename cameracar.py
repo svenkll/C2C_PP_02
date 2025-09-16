@@ -15,11 +15,15 @@ class CameraCar(BaseCar):
         self.picture_collect()
         print("CameraCar erzeugt")
 
-    def picture_collect(self):
+    def picture_handler(self):
         img = self.camera.get_frame()
         self.camera.release()
         cv2.imwrite("Bild.jpg", img)
-        print(img)
+        img_small = cv2.resize(img, None, fx=0.25, fy=0.25)
+        #plt.imshow(img)
+
+
+
 
 #main()
 
