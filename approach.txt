@@ -1,7 +1,7 @@
 1. understaning of basisklassen_cam -> done
 2. on the ground-> two traces/lanes with blue color
 3. test camera with own methode and test with OpenCV -> Demo_camera.ipynb
-4. Dashboard -> open first version from Sven -> push in the git
+4. Dashboard -> open first version from Sven -> push in the git -> done good job!!!
 5. create cameracar Klasse -> onging
 
 6. live bild -> Berechnung Lenkwinkel (label) (how could we calculate the angel based on the live picture??)
