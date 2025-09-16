@@ -19,7 +19,8 @@ class CameraCar(BaseCar):
         img = self.camera.get_frame()
         self.camera.release()
         cv2.imwrite("Bild.jpg", img)
-        print(img)
+        plt.imshow(img)
+
 
 #main()
 

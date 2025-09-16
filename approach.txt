@@ -1,9 +1,10 @@
 1. understaning of basisklassen_cam -> done
 2. on the ground-> two traces/lanes with blue color
 3. test camera with own methode and test with OpenCV -> Demo_camera.ipynb
-4. Dashboard -> open 
-5. create cameracar Klasse -> open
-6. live bild -> Berechnung Lenkwinkel (label) -> save the picture (welche Bilder matcht welche winkel) -> open
+4. Dashboard -> open first version from Sven -> push in the git
+5. create cameracar Klasse -> onging
+
+6. live bild -> Berechnung Lenkwinkel (label) (how could we calculate the angel based on the live picture??)
+7. save the picture (welche Bilder matcht welche winkel) -> open
 (jpg, int), Bild01_winkel_90.jpg, -> list = string.split("_")[-1]
-7. how could we calculate the angel based on the live picture??
 8. collect the pictures-> open
