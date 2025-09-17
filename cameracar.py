@@ -59,7 +59,7 @@ class CameraCar(BaseCar):
         if len(rechts) == 1:
             rdurch = rechts
             print(rdurch)
-            alpha2 = np.arctan((rdurch[3]-rdurch[1])/(rdurch[2]-rdurch[0]))
+            alpha2 = np.arctan((rdurch[0][3]-rdurch[0][1])/(rdurch[0][2]-rdurch[0][0]))
             alpha2 = np.degrees(alpha2)
             print(f"Alpha2 {alpha2}")
         elif len(rechts) >= 2:
@@ -77,7 +77,7 @@ class CameraCar(BaseCar):
         if len(links) == 1:
             ldurch = links 
             print(f"Ldurch {ldurch}")
-            alpha = np.arctan((ldurch[3]-ldurch[1])/(ldurch[2]-ldurch[0]))
+            alpha = np.arctan((ldurch[0][3]-ldurch[0][1])/(ldurch[0][2]-ldurch[0][0]))
             alpha = abs(np.degrees(alpha))
             print(f"Alpha {alpha}")
         elif len(links) >= 2:
