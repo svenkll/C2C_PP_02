@@ -32,38 +32,49 @@ class CameraCar(BaseCar):
         img_filtered = cv2.inRange(hsv, lower_blue, upper_blue)
         img_edges = cv2.Canny(img_filtered, 900, 1000)
         lines = cv2.HoughLinesP(img_edges,  1, np.pi / 180, threshold=30, minLineLength=25, maxLineGap=10) # extern Input ?
+        #zu entscheiden, welche angpasst Bild soll gespecihert werden
         cv2.imwrite("/home/pi/Desktop/git/C2C_PP_02/pictures_modified/Bild_angepasst.jpg", img_edges)
         return lines
         #plt.imshow(img)
         
-    def angle_calc(self, HoughLinesP):
-        pass
-#         if lines is not None:
-#           rechts = []
-#           links = []
-#           for line in lines:
-#               xEnd, yEnd, xStart, yStart = line[0]
-#               länge = np.sqrt((rxEnd-rxStart)**2 + (ryEnd - ryStart)**2)
-#               if xStart < 60:
-#                   print("Links")
-#                   links.append(line[0])
-#               elif xStart > 60:
-#                   print("Rechts")
-#                   rechts.append(line[0])
-#       rdurch = (rechts[0] + rechts[1])/2
-#       ldurch = (links[0] + links[1])/2
-#       print(rdurch)
-#       print(ldurch)
+    def angle_calc(self, lines):
+        if lines is not None:
+            rechts = []
+            links = []
+            for line in lines:
+                xEnd, yEnd, xStart, yStart = line[0]
+                
+                if xEnd < 60:
+                    print("Links")
+                    links.append(line[0])
+                elif xEnd > 60:
+                    print("Rechts")
+                    rechts.append(line[0])
+        if rechts != []:
+            rdurch = (rechts[0] + rechts[1])/2
+            print(rdurch)
+            alpha2 = np.arctan((rdurch[3]-rdurch[1])/(rdurch[2]-rdurch[0]))
+            alpha2 = np.degrees(alpha2)
+            print(alpha2)
+        else:
+            print("no right lane")
+            alpha2 = 60 # muss noch überprüft werden
 
-#       alpha2 = np.arctan((rdurch[3]-rdurch[1])/(rdurch[2]-rdurch[0]))
-#       alpha2 = np.degrees(alpha2)
-#       alpha2
+        if links != []:
+            ldurch = (links[0] + links[1])/2
+            print(ldurch)
+            alpha = np.arctan((ldurch[3]-ldurch[1])/(ldurch[2]-ldurch[0]))
+            alpha = abs(np.degrees(alpha))
+            print(alpha)
+        else:
+            print("no left lane")
+            alpha = 60 # muss noch überprüft werden
 
-#       alpha = np.arctan((ldurch[3]-ldurch[1])/(ldurch[2]-ldurch[0]))
-#       alpha = abs(np.degrees(alpha))
-#       alpha
+        # Berechnung des Lenkwinkels
 
-#       diffangle = alpha2-alpha
+        diffangle = 90 + (alpha2-alpha)
+
+        return diffangle
 
 # lenkwinkel berechnen und zurückgeben
 
