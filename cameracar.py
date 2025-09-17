@@ -23,9 +23,11 @@ class CameraCar(BaseCar):
         cv2.imwrite("/home/pi/Desktop/git/C2C_PP_02/pictures/Bild.jpg", img)
         # cv2.imwrite("Bild.jpg", img)
         img_read = cv2.imread("/home/pi/Desktop/git/C2C_PP_02/pictures/Bild.jpg")
-        img_small = cv2.resize(img_read, None, fx=0.5, fy=0.5) # 50% prozent vom originalen Bild, fx, fy als parameter
-        #print(img_small)
-        img_cropped = img_small.copy()[40:90, 20:150, :] #40:90 und 20:150 als variablen oder einstellbar
+        img_small = cv2.resize(img_read, None, fx=0.25, fy=0.25) # 50% prozent vom originalen Bild, fx, fy als parameter
+        cv2.imwrite("/home/pi/Desktop/git/C2C_PP_02/pictures/Bild_small.jpg", img_small)
+        print(img_small.shape)
+        img_cropped = img_small.copy()[40:90, :, :] #40:90 und 20:150 als variablen oder einstellbar
+        cv2.imwrite("/home/pi/Desktop/git/C2C_PP_02/pictures/Bild_cropped.jpg", img_cropped)
         hsv = cv2.cvtColor(img_cropped,cv2.COLOR_BGR2HSV)
         print(hsv.shape)
         lower_blue = np.array(lower_blue_input)
@@ -57,14 +59,14 @@ class CameraCar(BaseCar):
         if len(rechts) == 1:
             rdurch = rechts
             print(rdurch)
-            alpha2 = np.arctan((rdurch[0][3]-rdurch[0][1])/(rdurch[0][2]-rdurch[0][0]))
+            alpha2 = np.arctan((rdurch[3]-rdurch[1])/(rdurch[2]-rdurch[0]))
             alpha2 = np.degrees(alpha2)
             print(f"Alpha2 {alpha2}")
         elif len(rechts) >= 2:
             rdurch = np.mean(rechts, axis=0, keepdims=False) #muss noch parameter angepasst werden
             #(rechts[0] + rechts[1])/2
             print(rdurch)
-            alpha2 = np.arctan((rdurch[0][3]-rdurch[0][1])/(rdurch[0][2]-rdurch[0][0]))
+            alpha2 = np.arctan((rdurch[3]-rdurch[1])/(rdurch[2]-rdurch[0]))
             alpha2 = np.degrees(alpha2)
             print(f"Alpha2 {alpha2}")
         else:
@@ -75,13 +77,13 @@ class CameraCar(BaseCar):
         if len(links) == 1:
             ldurch = links 
             print(f"Ldurch {ldurch}")
-            alpha = np.arctan((ldurch[0][3]-ldurch[0][1])/(ldurch[0][2]-ldurch[0][0]))
+            alpha = np.arctan((ldurch[3]-ldurch[1])/(ldurch[2]-ldurch[0]))
             alpha = abs(np.degrees(alpha))
             print(f"Alpha {alpha}")
         elif len(links) >= 2:
             ldurch = np.mean(links, axis=0, keepdims=False)
             print(f"Ldurch {ldurch}")
-            alpha = np.arctan((ldurch[0][3]-ldurch[0][1])/(ldurch[0][2]-ldurch[0][0]))
+            alpha = np.arctan((ldurch[3]-ldurch[1])/(ldurch[2]-ldurch[0]))
             alpha = abs(np.degrees(alpha))
             print(f"Alpha {alpha}")
         else:
@@ -111,7 +113,7 @@ cam = Camera(devicenumber = 0,
             height = 480,
             width = 640,
             flip = True,
-            colorspace = 'rgb')
+            )
 
 
 cam_car = CameraCar(front,back,cam, [])
