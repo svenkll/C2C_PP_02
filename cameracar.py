@@ -12,35 +12,39 @@ class CameraCar(BaseCar):
     def __init__(self, front, back, camera, values_to_log):
         super().__init__(front, back, values_to_log)
         self.camera = camera
-        self.picture_collect()
+        self.index = 0
         print("CameraCar erzeugt")
 
     def picture_handler(self, lower_blue_input=[90, 60, 60], upper_blue_input=[130, 255, 255] ):
+        self.index += 1
         img = self.camera.get_frame()
         self.camera.release()
         #muss noch angepasst werden, wegen Dateien Benennung Ziel: Bild0x_Winkel_Grad
         cv2.imwrite("/home/pi/Desktop/git/C2C_PP_02/pictures/Bild.jpg", img)
         # cv2.imwrite("Bild.jpg", img)
-        img = cv2.imread("/home/pi/Desktop/git/C2C_PP_02/pictures/Bild.jpg")
-        img_small = cv2.resize(img, None, fx=0.25, fy=0.25)
-        print(img_small)
-        img_cropped = img_small.copy()[40:90, 20:150, :]
+        img_read = cv2.imread("/home/pi/Desktop/git/C2C_PP_02/pictures/Bild.jpg")
+        img_small = cv2.resize(img_read, None, fx=0.5, fy=0.5) # 50% prozent vom originalen Bild, fx, fy als parameter
+        #print(img_small)
+        img_cropped = img_small.copy()[40:90, 20:150, :] #40:90 und 20:150 als variablen oder einstellbar
         hsv = cv2.cvtColor(img_cropped,cv2.COLOR_BGR2HSV)
         print(hsv.shape)
         lower_blue = np.array(lower_blue_input)
+        print(lower_blue)
         upper_blue = np.array(upper_blue_input)
+        print(upper_blue)
         img_filtered = cv2.inRange(hsv, lower_blue, upper_blue)
         img_edges = cv2.Canny(img_filtered, 900, 1000)
         lines = cv2.HoughLinesP(img_edges,  1, np.pi / 180, threshold=30, minLineLength=25, maxLineGap=10) # extern Input ?
         #zu entscheiden, welche angpasst Bild soll gespecihert werden
         cv2.imwrite("/home/pi/Desktop/git/C2C_PP_02/pictures_modified/Bild_angepasst.jpg", img_edges)
-        return lines
+        return lines, img
         #plt.imshow(img)
-        
+
+ # lenkwinkel berechnen und zurückgeben       
     def angle_calc(self, lines):
+        rechts = []
+        links = []
         if lines is not None:
-            rechts = []
-            links = []
             for line in lines:
                 xEnd, yEnd, xStart, yStart = line[0]
                 
@@ -50,38 +54,53 @@ class CameraCar(BaseCar):
                 elif xEnd > 60:
                     print("Rechts")
                     rechts.append(line[0])
-        if rechts != []:
-            rdurch = (rechts[0] + rechts[1])/2
+        if len(rechts) == 1:
+            rdurch = rechts
             print(rdurch)
-            alpha2 = np.arctan((rdurch[3]-rdurch[1])/(rdurch[2]-rdurch[0]))
+            alpha2 = np.arctan((rdurch[0][3]-rdurch[0][1])/(rdurch[0][2]-rdurch[0][0]))
             alpha2 = np.degrees(alpha2)
-            print(alpha2)
+            print(f"Alpha2 {alpha2}")
+        elif len(rechts) >= 2:
+            rdurch = np.mean(rechts, axis=0, keepdims=False) #muss noch parameter angepasst werden
+            #(rechts[0] + rechts[1])/2
+            print(rdurch)
+            alpha2 = np.arctan((rdurch[0][3]-rdurch[0][1])/(rdurch[0][2]-rdurch[0][0]))
+            alpha2 = np.degrees(alpha2)
+            print(f"Alpha2 {alpha2}")
         else:
             print("no right lane")
             alpha2 = 60 # muss noch überprüft werden
 
-        if links != []:
-            ldurch = (links[0] + links[1])/2
-            print(ldurch)
-            alpha = np.arctan((ldurch[3]-ldurch[1])/(ldurch[2]-ldurch[0]))
+        #mit einer linie probieren
+        if len(links) == 1:
+            ldurch = links 
+            print(f"Ldurch {ldurch}")
+            alpha = np.arctan((ldurch[0][3]-ldurch[0][1])/(ldurch[0][2]-ldurch[0][0]))
             alpha = abs(np.degrees(alpha))
-            print(alpha)
+            print(f"Alpha {alpha}")
+        elif len(links) >= 2:
+            ldurch = np.mean(links, axis=0, keepdims=False)
+            print(f"Ldurch {ldurch}")
+            alpha = np.arctan((ldurch[0][3]-ldurch[0][1])/(ldurch[0][2]-ldurch[0][0]))
+            alpha = abs(np.degrees(alpha))
+            print(f"Alpha {alpha}")
         else:
             print("no left lane")
             alpha = 60 # muss noch überprüft werden
 
         # Berechnung des Lenkwinkels
 
-        diffangle = 90 + (alpha2-alpha)
+        diffangle = 90 + (alpha2-alpha) # vielleicht muss mit Betrag (Vorzeichen) bearbeitet werden
+        print(f"Diffwinkel   {diffangle}")
 
         return diffangle
 
-# lenkwinkel berechnen und zurückgeben
-
-    
-
-
-
+    def save_picture(self, img, diffangle):
+        picture_index = self.index #??
+        picture_path = f"/home/pi/Desktop/git/C2C_PP_02/pictures/Bild_{picture_index}_{diffangle}.jpg"
+        cv2.imwrite(picture_path, img)
+        
+   
 #main()
 
 front = FrontWheels()
@@ -96,3 +115,6 @@ cam = Camera(devicenumber = 0,
 
 
 cam_car = CameraCar(front,back,cam, [])
+lines, img = cam_car.picture_handler()
+
+cam_car.angle_calc(lines)
