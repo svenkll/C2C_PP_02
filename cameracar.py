@@ -15,22 +15,28 @@ class CameraCar(BaseCar):
         self.picture_collect()
         print("CameraCar erzeugt")
 
-    def picture_handler(self):
+    def picture_handler(self, lower_blue_input=[90, 60, 60], upper_blue_input=[130, 255, 255] ):
         img = self.camera.get_frame()
         self.camera.release()
+        #muss noch angepasst werden, wegen Dateien Benennung Ziel: Bild0x_Winkel_Grad
+        cv2.imwrite("/home/pi/Desktop/git/C2C_PP_02/pictures/Bild.jpg", img)
         # cv2.imwrite("Bild.jpg", img)
+        img = cv2.imread("/home/pi/Desktop/git/C2C_PP_02/pictures/Bild.jpg")
         img_small = cv2.resize(img, None, fx=0.25, fy=0.25)
-        img_cropped = img_small[25:90, 10:140, :]
+        print(img_small)
+        img_cropped = img_small.copy()[40:90, 20:150, :]
         hsv = cv2.cvtColor(img_cropped,cv2.COLOR_BGR2HSV)
-        lower_blue = np.array([30, 50, 50]) # extern Input
-        upper_blue = np.array([60, 200, 200]) # extern Input
-        img_filtered = cv2.inRange(img_cropped, lower_blue, upper_blue)
+        print(hsv.shape)
+        lower_blue = np.array(lower_blue_input)
+        upper_blue = np.array(upper_blue_input)
+        img_filtered = cv2.inRange(hsv, lower_blue, upper_blue)
         img_edges = cv2.Canny(img_filtered, 900, 1000)
         lines = cv2.HoughLinesP(img_edges,  1, np.pi / 180, threshold=30, minLineLength=25, maxLineGap=10) # extern Input ?
+        cv2.imwrite("/home/pi/Desktop/git/C2C_PP_02/pictures_modified/Bild_angepasst.jpg", img_edges)
         return lines
         #plt.imshow(img)
         
-    def angle_calc(self, HoughLinesP)
+    def angle_calc(self, HoughLinesP):
         pass
 #         if lines is not None:
 #           rechts = []
