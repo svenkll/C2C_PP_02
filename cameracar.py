@@ -6,6 +6,7 @@ import json
 import numpy as np
 import matplotlib.pylab as plt
 import cv2
+import time
 
 class CameraCar(BaseCar):
 
@@ -99,15 +100,19 @@ class CameraCar(BaseCar):
         return diffangle
 
     def save_picture(self, img, diffangle):
-        picture_index = self.index #??
-        picture_path = f"/home/pi/Desktop/git/C2C_PP_02/pictures/Bild_{picture_index}_{diffangle}.jpg"
+        #picture_index = self.index #??
+        int_angle = int(diffangle)
+        picture_path = f"/home/pi/Desktop/git/C2C_PP_02/pictures/Bild_{self.index}_{int_angle}.jpg"
         cv2.imwrite(picture_path, img)
+        self.index += 1
+        
         
         
         
     def video_handler(self, lower_blue_input=[90, 60, 60], upper_blue_input=[130, 255, 255]):
         # while True:
             video_stream = self.camera.get_frame()
+            img = video_stream
             video_small = cv2.resize(video_stream, None, fx=0.25, fy=0.25) # 50% prozent vom originalen Bild, fx, fy als parameter
             video_cropped = video_small.copy()[40:90, :, :] #40:90 und 20:150 als variablen oder einstellbar
             video_hsv = cv2.cvtColor(video_cropped,cv2.COLOR_BGR2HSV)
@@ -116,7 +121,7 @@ class CameraCar(BaseCar):
             video_filtered = cv2.inRange(video_hsv, lower_blue, upper_blue)
             video_edges = cv2.Canny(video_filtered, 900, 1000)
             lines = cv2.HoughLinesP(video_edges,  1, np.pi / 180, threshold=30, minLineLength=25, maxLineGap=10) # extern Input ?
-            return lines
+            return lines, img
 
    
 if __name__ == "__main__":
@@ -132,13 +137,19 @@ if __name__ == "__main__":
                 )
 
 
+
     cam_car = CameraCar(front,back,cam, [])
     cam_car.drive(30,90)
-    while True:
-        lines = cam_car.video_handler()
+    i = 0
+    while i < 15:
+        lines, img = cam_car.video_handler()
         diffangle = cam_car.angle_calc(lines)
         cam_car.drive(new_angle=diffangle)
-        time.sleep(0.5)
+        cam_car.save_picture(img, diffangle)
+        time.sleep(0.2)
+        i +=1 
+    cam_car.stop()
+
 
     # lines, img = cam_car.picture_handler()
     # cam_car.angle_calc(lines)
