@@ -15,7 +15,9 @@ class CameraCar(BaseCar):
         self.camera = camera
         self.frame = self.camera.get_frame()
         self.index = 0
-        # upper_blue_input in die init für die slider bei Dash
+        self.upper_blue_input = np.array([90, 60, 60])
+        self.lower_blue_input = np.array([130, 255, 255])
+        # upper_blue_input in die init für die slider bei Dash // funktionen anpassen auf self. upper
         # lower_blue_input in die init für die slider bei Dash
         print("CameraCar erzeugt")
 
@@ -112,15 +114,15 @@ class CameraCar(BaseCar):
         
         
         
-    def video_handler(self, lower_blue_input=[90, 60, 60], upper_blue_input=[130, 255, 255]):
+    def video_handler(self):
         # while True:
             video_stream = self.frame
             img = video_stream
             video_small = cv2.resize(video_stream, None, fx=0.25, fy=0.25) # 50% prozent vom originalen Bild, fx, fy als parameter
             video_cropped = video_small.copy()[40:90, :, :] #40:90 und 20:150 als variablen oder einstellbar
             video_hsv = cv2.cvtColor(video_cropped,cv2.COLOR_BGR2HSV)
-            lower_blue = np.array(lower_blue_input)
-            upper_blue = np.array(upper_blue_input)
+            lower_blue = self.lower_blue_input
+            upper_blue = self.upper_blue_input
             video_filtered = cv2.inRange(video_hsv, lower_blue, upper_blue)
             video_edges = cv2.Canny(video_filtered, 900, 1000)
             lines = cv2.HoughLinesP(video_edges,  1, np.pi / 180, threshold=30, minLineLength=25, maxLineGap=10)
@@ -129,12 +131,14 @@ class CameraCar(BaseCar):
         
         
         
-    def video_streams(self, lower_blue_input=[90, 60, 60], upper_blue_input=[130, 255, 255]):
+    def video_streams(self):
         while True:
             frame = self.frame
             # self.frame = cv2.resize(self.cam.get_frame(), None, fx=0.25, fy=0.25)
             hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-            filtered = cv2.inRange(hsv, np.array(lower_blue_input), np.array(upper_blue_input))
+            lower_blue = self.lower_blue_input
+            upper_blue = self.upper_blue_input
+            filtered = cv2.inRange(hsv, lower_blue, upper_blue)
             _, frame_as_jpeg = cv2.imencode(".jpeg", filtered)
             frame_in_bytes = frame_as_jpeg.tobytes()
 
@@ -147,12 +151,14 @@ class CameraCar(BaseCar):
             
             
     
-    def video_streams_Canny(self, lower_blue_input=[90, 60, 60], upper_blue_input=[130, 255, 255]):
+    def video_streams_Canny(self):
         while True:
             canny = self.frame
             # self.frame = cv2.resize(self.cam.get_frame(), None, fx=0.25, fy=0.25)
             hsv = cv2.cvtColor(canny, cv2.COLOR_BGR2HSV)
-            filtered = cv2.inRange(hsv, np.array(lower_blue_input), np.array(upper_blue_input))
+            lower_blue = self.lower_blue_input
+            upper_blue = self.upper_blue_input
+            filtered = cv2.inRange(hsv, lower_blue, upper_blue)
             video_edges = cv2.Canny(filtered, 900, 1000)
             _, frame_as_jpeg = cv2.imencode(".jpeg", video_edges)
             frame_in_bytes = frame_as_jpeg.tobytes()
@@ -163,14 +169,14 @@ class CameraCar(BaseCar):
             yield frame_as_string
             # self.frame = self.camera.get_frame()
             
-    def video_streams_lines(self, lower_blue_input=[90, 60, 60], upper_blue_input=[130, 255, 255]): 
+    def video_streams_lines(self): 
         while True: 
             video_stream = self.frame
             video_small = cv2.resize(video_stream, None, fx=0.25, fy=0.25) # 50% prozent vom originalen Bild, fx, fy als parameter
             video_cropped = video_small.copy()[40:90, :, :] #40:90 und 20:150 als variablen oder einstellbar
             video_hsv = cv2.cvtColor(video_cropped,cv2.COLOR_BGR2HSV)
-            lower_blue = np.array(lower_blue_input)
-            upper_blue = np.array(upper_blue_input)
+            lower_blue = self.lower_blue_input
+            upper_blue = self.upper_blue_input
             video_filtered = cv2.inRange(video_hsv, lower_blue, upper_blue)
             video_edges = cv2.Canny(video_filtered, 900, 1000)
             lines = cv2.HoughLinesP(video_edges,  1, np.pi / 180, threshold=30, minLineLength=25, maxLineGap=10)

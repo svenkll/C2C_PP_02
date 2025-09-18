@@ -53,11 +53,14 @@ app.layout = html.Div(children=[
         ]),
         
     dbc.Row([
-        dbc.Col([dcc.RangeSlider(id="h-slider", min=0, max=180, value=[50, 100])])
+        dbc.Col([dcc.RangeSlider(id="h-slider", min=0, max=180, value=[90, 130])])
     ]),
     dbc.Row([
-        dbc.Col([dcc.RangeSlider(id="s-slider", min=0, max=255, value=[0, 255])])
-    ])
+        dbc.Col([dcc.RangeSlider(id="s-slider", min=0, max=255, value=[60, 255])])
+    ]),
+    dbc.Row([
+        dbc.Col([dcc.RangeSlider(id="v-slider", min=0, max=255, value=[100, 180])])
+    ]),
 ])
 
 
@@ -65,16 +68,16 @@ app.layout = html.Div(children=[
     Output("div-1", "children"),
     Input("h-slider", "value"),
     Input("s-slider", "value"),
+    Input("v-slider", "value"),
 )
-def update_div_1(h_input, s_input):
+def update_div_1(h_input, s_input, v_input):
     h_low, h_up = h_input
     s_low, s_up = s_input
-    # lower = np.array([h_low, s_low, 0])
-    # upper = np.array([h_up, s_up, 255])
-    # proc.video_streams(lower_blue_input=lower)
-    # proc.video_streams(upper_blue_input=upper)
-    print(h_input)
-    return "Getriggert" + str(h_input)
+    v_low, v_up = v_input
+    proc.lower_blue_input = np.array([h_low, s_low, v_low])
+    proc.upper_blue_input = np.array([h_up, s_up, v_up])
+    # print(h_input)
+    return f"H Input {h_input} | S Input {s_input} | V Input {v_input}"
 
 @app.callback(
     Output("div-1", "children", allow_duplicate=True),
@@ -83,7 +86,7 @@ def update_div_1(h_input, s_input):
 )
 def update_div_1(h_input):
     print(h_input)
-    return "Getriggert" + str(h_input)
+    return f"H Input {h_input} | S Input {s_input} | V Input {v_input}"
 
 
 if __name__ == "__main__":
