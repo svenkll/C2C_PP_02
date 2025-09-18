@@ -33,13 +33,23 @@ def video_stream():
     return Response(proc.video_streams(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
+@server.route("/video_stream_Canny")
+def video_stream_Canny():
+    return Response(proc.video_streams_Canny(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@server.route("/video_stream_line")
+def video_streams_lines():
+    return Response(proc.video_streams_lines(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
 app = Dash(__name__, external_stylesheets=external_stylesheets, server=server)
 
 app.layout = html.Div(children=[
     dbc.Row([
         dbc.Col([html.Div("Hallo", id="div-1")]), 
         dbc.Col([html.Div(html.Img(src="/video_stream"))]),
-        # dbc.Col([html.Div(html.Img(src="/video_stream_gray"))])
+        dbc.Col([html.Div(html.Img(src="/video_stream_Canny"))]),
+        dbc.Col([html.Div(html.Img(src="/video_stream_line"), style={"width": "800px", "height": "600px"})])
         ]),
         
     dbc.Row([

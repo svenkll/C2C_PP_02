@@ -13,6 +13,7 @@ class CameraCar(BaseCar):
     def __init__(self, front, back, camera, values_to_log):
         super().__init__(front, back, values_to_log)
         self.camera = camera
+        self.frame = camera.get_frame()
         self.index = 0
         print("CameraCar erzeugt")
 
@@ -111,7 +112,7 @@ class CameraCar(BaseCar):
         
     def video_handler(self, lower_blue_input=[90, 60, 60], upper_blue_input=[130, 255, 255]):
         # while True:
-            video_stream = self.camera.get_frame()
+            video_stream = self.frame()
             img = video_stream
             video_small = cv2.resize(video_stream, None, fx=0.25, fy=0.25) # 50% prozent vom originalen Bild, fx, fy als parameter
             video_cropped = video_small.copy()[40:90, :, :] #40:90 und 20:150 als variablen oder einstellbar
@@ -128,11 +129,52 @@ class CameraCar(BaseCar):
         
     def video_streams(self, lower_blue_input=[90, 60, 60], upper_blue_input=[130, 255, 255]):
         while True:
-            frame = self.camera.get_frame()
+            frame = self.frame
             # self.frame = cv2.resize(self.cam.get_frame(), None, fx=0.25, fy=0.25)
             hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
             filtered = cv2.inRange(hsv, np.array(lower_blue_input), np.array(upper_blue_input))
             _, frame_as_jpeg = cv2.imencode(".jpeg", filtered)
+            frame_in_bytes = frame_as_jpeg.tobytes()
+
+            frame_as_string = (b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + frame_in_bytes + b'\r\n\r\n')
+
+            yield frame_as_string
+            
+            
+    
+    def video_streams_Canny(self, lower_blue_input=[90, 60, 60], upper_blue_input=[130, 255, 255]):
+        while True:
+            frame = self.frame
+            # self.frame = cv2.resize(self.cam.get_frame(), None, fx=0.25, fy=0.25)
+            hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+            filtered = cv2.inRange(hsv, np.array(lower_blue_input), np.array(upper_blue_input))
+            video_edges = cv2.Canny(filtered, 900, 1000)
+            _, frame_as_jpeg = cv2.imencode(".jpeg", video_edges)
+            frame_in_bytes = frame_as_jpeg.tobytes()
+
+            frame_as_string = (b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + frame_in_bytes + b'\r\n\r\n')
+
+            yield frame_as_string
+            
+    def video_streams_lines(self, lower_blue_input=[90, 60, 60], upper_blue_input=[130, 255, 255]): 
+        while True: 
+            video_stream = self.frame
+            video_small = cv2.resize(video_stream, None, fx=0.25, fy=0.25) # 50% prozent vom originalen Bild, fx, fy als parameter
+            video_cropped = video_small.copy()[40:90, :, :] #40:90 und 20:150 als variablen oder einstellbar
+            video_hsv = cv2.cvtColor(video_cropped,cv2.COLOR_BGR2HSV)
+            lower_blue = np.array(lower_blue_input)
+            upper_blue = np.array(upper_blue_input)
+            video_filtered = cv2.inRange(video_hsv, lower_blue, upper_blue)
+            video_edges = cv2.Canny(video_filtered, 900, 1000)
+            lines = cv2.HoughLinesP(video_edges,  1, np.pi / 180, threshold=30, minLineLength=25, maxLineGap=10)
+            video_line = video_cropped.copy()      
+            if lines is not None:
+                for line in lines:
+                    x1, y1, x2, y2 = line[0]
+                    cv2.line(video_line, (x1, y1), (x2, y2), (0, 255, 0), 1)
+            _, frame_as_jpeg = cv2.imencode(".jpeg", video_line)
             frame_in_bytes = frame_as_jpeg.tobytes()
 
             frame_as_string = (b'--frame\r\n'
