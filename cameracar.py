@@ -120,8 +120,27 @@ class CameraCar(BaseCar):
             upper_blue = np.array(upper_blue_input)
             video_filtered = cv2.inRange(video_hsv, lower_blue, upper_blue)
             video_edges = cv2.Canny(video_filtered, 900, 1000)
-            lines = cv2.HoughLinesP(video_edges,  1, np.pi / 180, threshold=30, minLineLength=25, maxLineGap=10) # extern Input ?
+            lines = cv2.HoughLinesP(video_edges,  1, np.pi / 180, threshold=30, minLineLength=25, maxLineGap=10)
+
             return lines, img
+        
+        
+        
+    def video_streams(self, lower_blue_input=[90, 60, 60], upper_blue_input=[130, 255, 255]):
+        while True:
+            frame = self.camera.get_frame()
+            # self.frame = cv2.resize(self.cam.get_frame(), None, fx=0.25, fy=0.25)
+            hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+            filtered = cv2.inRange(hsv, np.array(lower_blue_input), np.array(upper_blue_input))
+            _, frame_as_jpeg = cv2.imencode(".jpeg", filtered)
+            frame_in_bytes = frame_as_jpeg.tobytes()
+
+            frame_as_string = (b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + frame_in_bytes + b'\r\n\r\n')
+
+            yield frame_as_string
+
+        
 
    
 if __name__ == "__main__":
