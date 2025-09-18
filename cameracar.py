@@ -39,6 +39,7 @@ class CameraCar(BaseCar):
         lines = cv2.HoughLinesP(img_edges,  1, np.pi / 180, threshold=30, minLineLength=25, maxLineGap=10) # extern Input ?
         #zu entscheiden, welche angpasst Bild soll gespecihert werden
         cv2.imwrite("/home/pi/Desktop/git/C2C_PP_02/pictures_modified/Bild_angepasst.jpg", img_edges)
+        print(lines)
         return lines, img
         #plt.imshow(img)
 
@@ -102,21 +103,42 @@ class CameraCar(BaseCar):
         picture_path = f"/home/pi/Desktop/git/C2C_PP_02/pictures/Bild_{picture_index}_{diffangle}.jpg"
         cv2.imwrite(picture_path, img)
         
+        
+        
+    def video_handler(self, lower_blue_input=[90, 60, 60], upper_blue_input=[130, 255, 255]):
+        # while True:
+            video_stream = self.camera.get_frame()
+            video_small = cv2.resize(video_stream, None, fx=0.25, fy=0.25) # 50% prozent vom originalen Bild, fx, fy als parameter
+            video_cropped = video_small.copy()[40:90, :, :] #40:90 und 20:150 als variablen oder einstellbar
+            video_hsv = cv2.cvtColor(video_cropped,cv2.COLOR_BGR2HSV)
+            lower_blue = np.array(lower_blue_input)
+            upper_blue = np.array(upper_blue_input)
+            video_filtered = cv2.inRange(video_hsv, lower_blue, upper_blue)
+            video_edges = cv2.Canny(video_filtered, 900, 1000)
+            lines = cv2.HoughLinesP(video_edges,  1, np.pi / 180, threshold=30, minLineLength=25, maxLineGap=10) # extern Input ?
+            return lines
+
    
-#main()
+if __name__ == "__main__":
 
-front = FrontWheels()
-back = BackWheels()
-cam = Camera(devicenumber = 0,
-            buffersize = 10,
-            skip_frame = 0,
-            height = 480,
-            width = 640,
-            flip = True,
-            )
+    front = FrontWheels()
+    back = BackWheels()
+    cam = Camera(devicenumber = 0,
+                buffersize = 10,
+                skip_frame = 0,
+                height = 480,
+                width = 640,
+                flip = True,
+                )
 
 
-cam_car = CameraCar(front,back,cam, [])
-lines, img = cam_car.picture_handler()
+    cam_car = CameraCar(front,back,cam, [])
+    cam_car.drive(30,90)
+    while True:
+        lines = cam_car.video_handler()
+        diffangle = cam_car.angle_calc(lines)
+        cam_car.drive(new_angle=diffangle)
+        time.sleep(0.5)
 
-cam_car.angle_calc(lines)
+    # lines, img = cam_car.picture_handler()
+    # cam_car.angle_calc(lines)
