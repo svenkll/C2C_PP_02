@@ -26,7 +26,7 @@ app.layout = html.Div(children=[
     dbc.Row([
         dbc.Col([html.Div("Hallo", id="div-1")]), 
         dbc.Col([html.Div(html.Img(src="/video_stream"))]),
-        dbc.Col([html.Div(html.Img(src="/video_stream_gray"))])
+        # dbc.Col([html.Div(html.Img(src="/video_stream_gray"))])
         ]),
         
     dbc.Row([

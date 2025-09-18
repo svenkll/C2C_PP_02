@@ -69,8 +69,10 @@ app.layout = html.Div(children=[
 def update_div_1(h_input, s_input):
     h_low, h_up = h_input
     s_low, s_up = s_input
-    proc.lower = np.array([h_low, s_low, 0])
-    proc.upper = np.array([h_up, s_up, 255])
+    # lower = np.array([h_low, s_low, 0])
+    # upper = np.array([h_up, s_up, 255])
+    # proc.video_streams(lower_blue_input=lower)
+    # proc.video_streams(upper_blue_input=upper)
     print(h_input)
     return "Getriggert" + str(h_input)
 

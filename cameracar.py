@@ -13,8 +13,10 @@ class CameraCar(BaseCar):
     def __init__(self, front, back, camera, values_to_log):
         super().__init__(front, back, values_to_log)
         self.camera = camera
-        self.frame = camera.get_frame()
+        self.frame = self.camera.get_frame()
         self.index = 0
+        # upper_blue_input in die init für die slider bei Dash
+        # lower_blue_input in die init für die slider bei Dash
         print("CameraCar erzeugt")
 
     def picture_handler(self, lower_blue_input=[90, 60, 60], upper_blue_input=[130, 255, 255] ):
@@ -112,7 +114,7 @@ class CameraCar(BaseCar):
         
     def video_handler(self, lower_blue_input=[90, 60, 60], upper_blue_input=[130, 255, 255]):
         # while True:
-            video_stream = self.frame()
+            video_stream = self.frame
             img = video_stream
             video_small = cv2.resize(video_stream, None, fx=0.25, fy=0.25) # 50% prozent vom originalen Bild, fx, fy als parameter
             video_cropped = video_small.copy()[40:90, :, :] #40:90 und 20:150 als variablen oder einstellbar
@@ -141,13 +143,15 @@ class CameraCar(BaseCar):
 
             yield frame_as_string
             
+            self.frame = self.camera.get_frame()
+            
             
     
     def video_streams_Canny(self, lower_blue_input=[90, 60, 60], upper_blue_input=[130, 255, 255]):
         while True:
-            frame = self.frame
+            canny = self.frame
             # self.frame = cv2.resize(self.cam.get_frame(), None, fx=0.25, fy=0.25)
-            hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+            hsv = cv2.cvtColor(canny, cv2.COLOR_BGR2HSV)
             filtered = cv2.inRange(hsv, np.array(lower_blue_input), np.array(upper_blue_input))
             video_edges = cv2.Canny(filtered, 900, 1000)
             _, frame_as_jpeg = cv2.imencode(".jpeg", video_edges)
@@ -157,6 +161,7 @@ class CameraCar(BaseCar):
                 b'Content-Type: image/jpeg\r\n\r\n' + frame_in_bytes + b'\r\n\r\n')
 
             yield frame_as_string
+            # self.frame = self.camera.get_frame()
             
     def video_streams_lines(self, lower_blue_input=[90, 60, 60], upper_blue_input=[130, 255, 255]): 
         while True: 
@@ -181,6 +186,7 @@ class CameraCar(BaseCar):
                 b'Content-Type: image/jpeg\r\n\r\n' + frame_in_bytes + b'\r\n\r\n')
 
             yield frame_as_string
+            # self.frame = self.camera.get_frame()
 
         
 
