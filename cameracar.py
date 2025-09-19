@@ -142,7 +142,7 @@ class CameraCar(BaseCar):
     def video_handler(self):
         #angepasst mit while true
         #while True:
-            video_stream = self.frame
+            video_stream = self.camera.get_frame()
             #img = video_stream
             video_small = cv2.resize(video_stream, None, fx=0.25, fy=0.25) # 50% prozent vom originalen Bild, fx, fy als parameter
             video_cropped = video_small.copy()[40:90, :, :] #40:90 und 20:150 als variablen oder einstellbar
