@@ -127,7 +127,7 @@ class CameraCar(BaseCar):
         if alpha2 < 0:
             alpha2 = 90 + alpha2 + 90
 
-        diffangle = 90 + (5+alpha2-alpha) # vielleicht muss mit Betrag (Vorzeichen) bearbeitet werden
+        diffangle = 90 + (alpha2-alpha) # vielleicht muss mit Betrag (Vorzeichen) bearbeitet werden
         print(f"Diffwinkel   {diffangle}")
 
         return int(diffangle)
@@ -211,7 +211,9 @@ class CameraCar(BaseCar):
             video_filtered = cv2.inRange(video_hsv, lower_blue, upper_blue)
             video_edges = cv2.Canny(video_filtered, 50, 100)
             lines = cv2.HoughLinesP(video_edges,  1, np.pi / 180, threshold=30, minLineLength=15, maxLineGap=10)
-            video_line = video_cropped.copy()      
+            video_line = video_cropped.copy()    
+            angel = self.angle_calc(lines)
+            video_line = cv2.putText(video_line, str(angel), (10,10), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
             if lines is not None:
                 for line in lines:
                     x1, y1, x2, y2 = line[0]
