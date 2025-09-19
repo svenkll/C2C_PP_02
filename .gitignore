@@ -4,3 +4,4 @@ live_demo.ipynb
 .gitignore
 __pycache__
 camcar_test.py
+config.json

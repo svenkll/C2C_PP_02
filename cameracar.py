@@ -20,6 +20,28 @@ class CameraCar(BaseCar):
         # upper_blue_input in die init für die slider bei Dash // funktionen anpassen auf self. upper
         # lower_blue_input in die init für die slider bei Dash
         print("CameraCar erzeugt")
+        
+        
+    def farb_config(self):
+        try:
+            with open("config.json", "r") as ff:
+                data = json.load(ff)
+
+        except:
+            print("Keine geeignete Datei config.json gefunden!")
+            
+        else:
+            #dictionary
+            upper_blue_input = data["upper_blue_input"]
+            lower_blue_input = data["lower_blue_input"]
+            print("Daten in config.json:")
+
+            self.CameraCar.upper_blue_input(upper_blue_input)
+            self.CameraCar.lower_blue_input(lower_blue_input)
+            print(f"Daten upper {upper_blue_input} und lower {lower_blue_input}")
+            ff.close()
+        finally:
+            pass
 
     def picture_handler(self, lower_blue_input=[90, 60, 60], upper_blue_input=[130, 255, 255] ):
         self.index += 1
@@ -212,6 +234,7 @@ if __name__ == "__main__":
 
 
     cam_car = CameraCar(front,back,cam, [])
+    cam.farb_config()
     cam_car.drive(30,90)
     i = 0
     while i < 15:
