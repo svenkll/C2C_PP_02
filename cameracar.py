@@ -126,7 +126,7 @@ class CameraCar(BaseCar):
         diffangle = 90 + (alpha2-alpha) # vielleicht muss mit Betrag (Vorzeichen) bearbeitet werden
         print(f"Diffwinkel   {diffangle}")
 
-        return diffangle
+        return int(diffangle)
 
     def save_picture(self, img, diffangle):
         #picture_index = self.index #??
@@ -232,19 +232,19 @@ class CameraCar(BaseCar):
 
         
 # funktioniert noch nicht
-    def modus1(self):
-        cam.farb_config()
-        cam_car.drive(30,90)
+    def _modus1(self):
+        self.farb_config()
+        self.drive(30,90)
         i = 0
-        while i < 15:
-            lines, img = cam_car.video_handler()
-            diffangle = cam_car.angle_calc(lines)
-            cam_car.drive(new_angle=diffangle)
-            cam_car.save_picture(img, diffangle)
-            time.sleep(0.2)
-            i +=1 
-        cam_car.stop()
-        print("Die Fahrt ist beendet")    
+        while i < 260:
+            lines, img = self.video_handler()
+            diffangle = self.angle_calc(lines)
+            self.drive(new_angle=diffangle)
+            self.save_picture(img, diffangle)
+            #time.sleep(0.2)
+            i +=1
+        self.stop()
+        print("Die Fahrt ist beendet")
         
         
         
