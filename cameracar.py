@@ -13,6 +13,7 @@ class CameraCar(BaseCar):
     def __init__(self, front, back, camera, values_to_log):
         super().__init__(front, back, values_to_log)
         self.camera = camera
+        #??? liefert Video oder bilder zurück
         self.frame = self.camera.get_frame()
         self.index = 0
         self.upper_blue_input = np.array([90, 60, 60])
@@ -140,9 +141,9 @@ class CameraCar(BaseCar):
         
     def video_handler(self):
         #angepasst mit while true
-        while True:
+        #while True:
             video_stream = self.frame
-            img = video_stream
+            #img = video_stream
             video_small = cv2.resize(video_stream, None, fx=0.25, fy=0.25) # 50% prozent vom originalen Bild, fx, fy als parameter
             video_cropped = video_small.copy()[40:90, :, :] #40:90 und 20:150 als variablen oder einstellbar
             video_hsv = cv2.cvtColor(video_cropped,cv2.COLOR_BGR2HSV)
@@ -152,8 +153,8 @@ class CameraCar(BaseCar):
             video_edges = cv2.Canny(video_filtered, 900, 1000)
             lines = cv2.HoughLinesP(video_edges,  1, np.pi / 180, threshold=30, minLineLength=25, maxLineGap=10)
             
-            yield lines, img
-            self.frame = self.camera.get_frame()
+            return lines
+            #self.frame = self.camera.get_frame()
         
         
         
@@ -269,16 +270,16 @@ if __name__ == "__main__":
     cam_car = CameraCar(front,back,cam, [])
     cam_car.farb_config()
     cam_car.drive(30,90)
-"""     i = 0
+    i = 0
     while i < 15:
-        lines, img = cam_car.video_handler()
+        lines = cam_car.video_handler()
         print(lines)
         diffangle = cam_car.angle_calc(lines)        
         cam_car.drive(new_angle=diffangle)
-        cam_car.save_picture(img, diffangle)
+        #cam_car.save_picture(img, diffangle)
         time.sleep(0.2)
-        i +=1  """
-cam_car.stop()
+        i +=1 
+    cam_car.stop()
 
 
     # lines, img = cam_car.picture_handler()
