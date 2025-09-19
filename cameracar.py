@@ -26,24 +26,25 @@ class CameraCar(BaseCar):
         try:
             with open("config.json", "r") as ff:
                 data = json.load(ff)
-
-        except:
-            print("Keine geeignete Datei config.json gefunden!")
-            
+        except (FileNotFoundError, json.JSONDecodeError):
+            # Datei fehlt oder kaputt → Standardwerte
+            print("Keine geeignete Datei config.json gefunden! Default-Werte werden gesetzt.")
+            self.upper_blue_input = np.array([90, 60, 60])
+            self.lower_blue_input = np.array([130, 255, 255])
         else:
-            #dictionary
-            upper_blue_input = data["upper_blue_input"]
-            lower_blue_input = data["lower_blue_input"]
+            # Werte aus der Datei übernehmen
+            upper_blue_input = data.get("upper_blue_input", [90, 60, 60])
+            lower_blue_input = data.get("lower_blue_input", [130, 255, 255])
+            
+            # einzelne Positionen übernehmen
+            self.upper_blue_input = np.array(upper_blue_input)
+            self.lower_blue_input = np.array(lower_blue_input)
+            
             print("Daten in config.json:")
+            print(f"Upper: {self.upper_blue_input}, Lower: {self.lower_blue_input}")
 
-            self.CameraCar.upper_blue_input(upper_blue_input)
-            self.CameraCar.lower_blue_input(lower_blue_input)
-            print(f"Daten upper {upper_blue_input} und lower {lower_blue_input}")
-            ff.close()
-        finally:
-            pass
 
-    def picture_handler(self, lower_blue_input=[90, 60, 60], upper_blue_input=[130, 255, 255] ):
+    def picture_handler(self):
         self.index += 1
         img = self.camera.get_frame()
         self.camera.release()
@@ -58,9 +59,9 @@ class CameraCar(BaseCar):
         cv2.imwrite("/home/pi/Desktop/git/C2C_PP_02/pictures/Bild_cropped.jpg", img_cropped)
         hsv = cv2.cvtColor(img_cropped,cv2.COLOR_BGR2HSV)
         print(hsv.shape)
-        lower_blue = np.array(lower_blue_input)
+        lower_blue = self.lower_blue_input
         print(lower_blue)
-        upper_blue = np.array(upper_blue_input)
+        upper_blue = self.upper_blue_input
         print(upper_blue)
         img_filtered = cv2.inRange(hsv, lower_blue, upper_blue)
         img_edges = cv2.Canny(img_filtered, 900, 1000)
@@ -216,8 +217,37 @@ class CameraCar(BaseCar):
             yield frame_as_string
             # self.frame = self.camera.get_frame()
 
+
+    def start_mode(self, mode: int):
+        if mode == 1:
+            self._modus1()
+        elif mode == 2:
+            self._modus2()
+        else:
+            print(f"Unbekannter Modus")
+
         
 
+    def modus1(self):
+        cam.farb_config()
+        cam_car.drive(30,90)
+        i = 0
+        while i < 15:
+            lines, img = cam_car.video_handler()
+            diffangle = cam_car.angle_calc(lines)
+            cam_car.drive(new_angle=diffangle)
+            cam_car.save_picture(img, diffangle)
+            time.sleep(0.2)
+            i +=1 
+        cam_car.stop()
+        print("Die Fahrt ist beendet")    
+        
+        
+        
+        
+        
+        
+        
    
 if __name__ == "__main__":
 

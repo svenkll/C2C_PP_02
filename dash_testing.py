@@ -72,8 +72,8 @@ app.layout = html.Div([
     html.Hr(),
 
     dbc.Row([
-        dbc.Col([dbc.Button("Fahrmodus 1 starten", id="btn-mode1", color="primary")]),
-        dbc.Col([dbc.Button("Fahrmodus 2 starten", id="btn-mode2", color="secondary")]),
+        dbc.Col([dbc.Button("Fahrmodus manual starten", id="btn-mode1", color="primary")]),
+        dbc.Col([dbc.Button("Fahrmodus CNN starten", id="btn-mode2", color="secondary")]),
         dbc.Col([dbc.Button("Daten speichern", id="btn-save", color="success")])
     ]),
 
@@ -120,11 +120,11 @@ def handle_buttons(mode1_clicks, mode2_clicks, save_clicks, h_val, s_val, v_val)
 
     if button_id == "btn-mode1":
         proc.start_mode(1)  # Muss in CameraCar implementiert sein
-        return "Fahrmodus 1 gestartet!"
+        return "Fahrmodus manual gestartet!"
 
     elif button_id == "btn-mode2":
         proc.start_mode(2)
-        return "Fahrmodus 2 gestartet!"
+        return "Fahrmodus CNN gestartet!"
 
     elif button_id == "btn-save":
         h_low, h_up = h_val
