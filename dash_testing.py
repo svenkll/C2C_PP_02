@@ -69,6 +69,7 @@ app.layout = html.Div(children=[
     Input("h-slider", "value"),
     Input("s-slider", "value"),
     Input("v-slider", "value"),
+    
 )
 def update_div_1(h_input, s_input, v_input):
     h_low, h_up = h_input
@@ -77,15 +78,6 @@ def update_div_1(h_input, s_input, v_input):
     proc.lower_blue_input = np.array([h_low, s_low, v_low])
     proc.upper_blue_input = np.array([h_up, s_up, v_up])
     # print(h_input)
-    return f"H Input {h_input} | S Input {s_input} | V Input {v_input}"
-
-@app.callback(
-    Output("div-1", "children", allow_duplicate=True),
-    Input("s-slider", "value"),
-    prevent_initial_call=True
-)
-def update_div_1(h_input):
-    print(h_input)
     return f"H Input {h_input} | S Input {s_input} | V Input {v_input}"
 
 
