@@ -21,7 +21,7 @@ class CameraCar(BaseCar):
         # lower_blue_input in die init für die slider bei Dash
         print("CameraCar erzeugt")
         
-        
+ # werden die Parameter aus Json raus gelesen       
     def farb_config(self):
         try:
             with open("config.json", "r") as ff:
@@ -43,7 +43,7 @@ class CameraCar(BaseCar):
             print("Daten in config.json:")
             print(f"Upper: {self.upper_blue_input}, Lower: {self.lower_blue_input}")
 
-
+# werden die Bilder verarbeitet
     def picture_handler(self):
         self.index += 1
         img = self.camera.get_frame()
@@ -132,13 +132,15 @@ class CameraCar(BaseCar):
         int_angle = int(diffangle)
         picture_path = f"/home/pi/Desktop/git/C2C_PP_02/pictures/Bild_{self.index}_{int_angle}.jpg"
         cv2.imwrite(picture_path, img)
+        print(self.index)
         self.index += 1
-        
+            
         
         
         
     def video_handler(self):
-        # while True:
+        #angepasst mit while true
+        while True:
             video_stream = self.frame
             img = video_stream
             video_small = cv2.resize(video_stream, None, fx=0.25, fy=0.25) # 50% prozent vom originalen Bild, fx, fy als parameter
@@ -149,8 +151,9 @@ class CameraCar(BaseCar):
             video_filtered = cv2.inRange(video_hsv, lower_blue, upper_blue)
             video_edges = cv2.Canny(video_filtered, 900, 1000)
             lines = cv2.HoughLinesP(video_edges,  1, np.pi / 180, threshold=30, minLineLength=25, maxLineGap=10)
-
-            return lines, img
+            
+            yield lines, img
+            self.frame = self.camera.get_frame()
         
         
         
@@ -217,7 +220,7 @@ class CameraCar(BaseCar):
             yield frame_as_string
             # self.frame = self.camera.get_frame()
 
-
+# funktioniert noch nicht
     def start_mode(self, mode: int):
         if mode == 1:
             self._modus1()
@@ -227,7 +230,7 @@ class CameraCar(BaseCar):
             print(f"Unbekannter Modus")
 
         
-
+# funktioniert noch nicht
     def modus1(self):
         cam.farb_config()
         cam_car.drive(30,90)
@@ -264,17 +267,18 @@ if __name__ == "__main__":
 
 
     cam_car = CameraCar(front,back,cam, [])
-    cam.farb_config()
+    cam_car.farb_config()
     cam_car.drive(30,90)
-    i = 0
+"""     i = 0
     while i < 15:
         lines, img = cam_car.video_handler()
-        diffangle = cam_car.angle_calc(lines)
+        print(lines)
+        diffangle = cam_car.angle_calc(lines)        
         cam_car.drive(new_angle=diffangle)
         cam_car.save_picture(img, diffangle)
         time.sleep(0.2)
-        i +=1 
-    cam_car.stop()
+        i +=1  """
+cam_car.stop()
 
 
     # lines, img = cam_car.picture_handler()

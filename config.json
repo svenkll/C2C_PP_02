@@ -1,22 +1,17 @@
 {
+    
     "turning_offset": 0,
     "forward_A": 0,
     "forward_B": 0,
-    "ir_ref": [
-        170,
-        170,
-        170,
-        170,
-        170
-    ],
+
     "lower_blue_input": [
-        80,
-        54,
+        90,
+        60,
         60
     ],
     "upper_blue_input": [
-        118,
-        188,
-        164
+        130,
+        255,
+        180
     ]
 }

@@ -6,6 +6,7 @@
 6. Bilder resizing and Lenkwinkel Vorzeichen sollen angepasst werden -> open
 7. dash ist noch offen 
 
+problem aktuell: dash ist in Ordnung und erkannt die Linien, aber bei Fahren nicht!!
 
 6. live bild -> calculate angel (label) (how could we calculate the angel based on the live picture) -> done
 7. save the picture (welche Bilder matcht welche winkel) -> open
