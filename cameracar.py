@@ -122,8 +122,12 @@ class CameraCar(BaseCar):
             alpha = 60 # muss noch überprüft werden
 
         # Berechnung des Lenkwinkels
+        if alpha < 0:
+            alpha = 90 + alpha + 90
+        if alpha2 < 0:
+            alpha2 = 90 + alpha2 + 90
 
-        diffangle = 90 + (alpha2-alpha) # vielleicht muss mit Betrag (Vorzeichen) bearbeitet werden
+        diffangle = 90 + (5+alpha2-alpha) # vielleicht muss mit Betrag (Vorzeichen) bearbeitet werden
         print(f"Diffwinkel   {diffangle}")
 
         return diffangle
@@ -205,8 +209,8 @@ class CameraCar(BaseCar):
             lower_blue = self.lower_blue_input
             upper_blue = self.upper_blue_input
             video_filtered = cv2.inRange(video_hsv, lower_blue, upper_blue)
-            video_edges = cv2.Canny(video_filtered, 900, 1000)
-            lines = cv2.HoughLinesP(video_edges,  1, np.pi / 180, threshold=30, minLineLength=25, maxLineGap=10)
+            video_edges = cv2.Canny(video_filtered, 50, 100)
+            lines = cv2.HoughLinesP(video_edges,  1, np.pi / 180, threshold=30, minLineLength=15, maxLineGap=10)
             video_line = video_cropped.copy()      
             if lines is not None:
                 for line in lines:
@@ -271,13 +275,13 @@ if __name__ == "__main__":
     cam_car.farb_config()
     cam_car.drive(30,90)
     i = 0
-    while i < 15:
+    while i < 250:
         lines = cam_car.video_handler()
         print(lines)
         diffangle = cam_car.angle_calc(lines)        
         cam_car.drive(new_angle=diffangle)
         #cam_car.save_picture(img, diffangle)
-        time.sleep(0.2)
+        #time.sleep(0.1)
         i +=1 
     cam_car.stop()
 
