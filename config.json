@@ -1,17 +1,16 @@
 {
-    
-    "turning_offset": 10,
+    "turning_offset": 5,
     "forward_A": 0,
     "forward_B": 0,
-
+	
     "lower_blue_input": [
         90,
-        60,
-        60
+        52,
+        110
     ],
     "upper_blue_input": [
-        130,
+        126,
         255,
-        180
+        242
     ]
 }

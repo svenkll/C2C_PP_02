@@ -8,6 +8,7 @@ import matplotlib.pylab as plt
 import cv2
 import time
 
+
 class CameraCar(BaseCar):
 
     def __init__(self, front, back, camera, values_to_log):
@@ -21,6 +22,7 @@ class CameraCar(BaseCar):
         # upper_blue_input in die init für die slider bei Dash // funktionen anpassen auf self. upper
         # lower_blue_input in die init für die slider bei Dash
         print("CameraCar erzeugt")
+        #cam_car.stop()
         
  # werden die Parameter aus Json raus gelesen       
     def farb_config(self):
@@ -50,14 +52,14 @@ class CameraCar(BaseCar):
         img = self.camera.get_frame()
         self.camera.release()
         #muss noch angepasst werden, wegen Dateien Benennung Ziel: Bild0x_Winkel_Grad
-        cv2.imwrite("/home/pi/Desktop/git/C2C_PP_02/pictures/Bild.jpg", img)
+        cv2.imwrite("/home/pi/Camp2Code/C2C-PP02/C2C_PP_02/pictures/Bild.jpg", img) #/home/pi/Camp2Code/C2C-PP02/C2C_PP_02/pictures
         # cv2.imwrite("Bild.jpg", img)
-        img_read = cv2.imread("/home/pi/Desktop/git/C2C_PP_02/pictures/Bild.jpg")
+        img_read = cv2.imread("/home/pi/Camp2Code/C2C-PP02/C2C_PP_02/pictures/Bild.jpg")
         img_small = cv2.resize(img_read, None, fx=0.25, fy=0.25) # 50% prozent vom originalen Bild, fx, fy als parameter
-        cv2.imwrite("/home/pi/Desktop/git/C2C_PP_02/pictures/Bild_small.jpg", img_small)
+        cv2.imwrite("/home/pi/Camp2Code/C2C-PP02/C2C_PP_02/pictures/Bild_small.jpg", img_small)
         print(img_small.shape)
         img_cropped = img_small.copy()[40:90, :, :] #40:90 und 20:150 als variablen oder einstellbar
-        cv2.imwrite("/home/pi/Desktop/git/C2C_PP_02/pictures/Bild_cropped.jpg", img_cropped)
+        cv2.imwrite("/home/pi/Camp2Code/C2C-PP02/C2C_PP_02/picturesBild_cropped.jpg", img_cropped)
         hsv = cv2.cvtColor(img_cropped,cv2.COLOR_BGR2HSV)
         print(hsv.shape)
         lower_blue = self.lower_blue_input
@@ -129,7 +131,7 @@ class CameraCar(BaseCar):
 
         diffangle = 90 + (alpha2-alpha) # vielleicht muss mit Betrag (Vorzeichen) bearbeitet werden
         print(f"Diffwinkel   {diffangle}")
-
+        #time.sleep(0.5)  #Display the prints a bit slower
         return int(diffangle)
 
     def save_picture(self, img, diffangle):
@@ -203,7 +205,7 @@ class CameraCar(BaseCar):
     def video_streams_lines(self): 
         while True: 
             video_stream = self.frame
-            video_small = cv2.resize(video_stream, None, fx=0.25, fy=0.25) # 50% prozent vom originalen Bild, fx, fy als parameter
+            video_small = cv2.resize(video_stream, None, fx=0.25, fy=0.25) # 50% prozent vom originalen Bild, fx, fy als parameter (was fx=0.25, fy=0.25)
             video_cropped = video_small.copy()[40:90, :, :] #40:90 und 20:150 als variablen oder einstellbar
             video_hsv = cv2.cvtColor(video_cropped,cv2.COLOR_BGR2HSV)
             lower_blue = self.lower_blue_input

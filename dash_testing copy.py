@@ -52,57 +52,34 @@ config = load_config()
 # --------------------------
 app.layout = html.Div([
     dbc.Row([
-        dbc.Col(html.Div("Hallo", id="div-1"), width=12, className="text-center")
+        dbc.Col([html.Div("Hallo", id="div-1")]),
+        dbc.Col([html.Div(html.Img(src="/video_stream"))]),
+        dbc.Col([html.Div(html.Img(src="/video_stream_Canny"))]),
+        dbc.Col([html.Div(html.Img(src="/video_stream_line"), #))]),          #),
+                          style={"width": "800px", "height": "600px"})])
     ]),
 
-    # Video Row
     dbc.Row([
-        dbc.Col(html.Div(
-            html.Img(src="/video_stream",
-                     style={"width": "100%", "maxWidth": "640px", "height": "auto",
-                            "display": "block", "margin": "0 auto"})
-        ), width=4),
-
-        dbc.Col(html.Div(
-            html.Img(src="/video_stream_Canny",
-                     style={"width": "100%", "maxWidth": "640px", "height": "auto",
-                            "display": "block", "margin": "0 auto"})
-        ), width=4),
-
-        dbc.Col(html.Div(
-            html.Img(src="/video_stream_line",
-                     style={"width": "100%", "maxWidth": "800px", "height": "auto",
-                            "display": "block", "margin": "0 auto"})
-        ), width=4),
-    ], justify="center", align="center"),
-
-    html.Br(),
-
-    # Sliders
-    dbc.Row([
-        dbc.Col([dcc.RangeSlider(id="h-slider", min=0, max=180,
-                                 value=[config["lower_blue_input"][0], config["upper_blue_input"][0]])])
+        dbc.Col([dcc.RangeSlider(id="h-slider", min=0, max=180, value=[config["lower_blue_input"][0], config["upper_blue_input"][0]])])
     ]),
     dbc.Row([
-        dbc.Col([dcc.RangeSlider(id="s-slider", min=0, max=255,
-                                 value=[config["lower_blue_input"][1], config["upper_blue_input"][1]])])
+        dbc.Col([dcc.RangeSlider(id="s-slider", min=0, max=255, value=[config["lower_blue_input"][1], config["upper_blue_input"][1]])])
     ]),
     dbc.Row([
-        dbc.Col([dcc.RangeSlider(id="v-slider", min=0, max=255,
-                                 value=[config["lower_blue_input"][2], config["upper_blue_input"][2]])])
+        dbc.Col([dcc.RangeSlider(id="v-slider", min=0, max=255, value=[config["lower_blue_input"][2], config["upper_blue_input"][2]])])
     ]),
 
     html.Hr(),
 
-    # Buttons
     dbc.Row([
         dbc.Col([dbc.Button("Fahrmodus manual starten", id="btn-mode1", color="primary")]),
         dbc.Col([dbc.Button("Fahrmodus CNN starten", id="btn-mode2", color="secondary")]),
         dbc.Col([dbc.Button("Daten speichern", id="btn-save", color="success")])
-    ], justify="center"),
+    ]),
 
-    html.Div(id="status-text", style={"marginTop": "20px", "fontWeight": "bold", "textAlign": "center"})
+    html.Div(id="status-text", style={"marginTop": "20px", "fontWeight": "bold"})
 ])
+
 # --------------------------
 # Slider Callback
 # --------------------------
