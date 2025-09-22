@@ -85,43 +85,44 @@ class CameraCar(BaseCar):
                 xEnd, yEnd, xStart, yStart = line[0]
                 
                 if xEnd < 60:
-                    print("Links")
+                    #print("Links")
                     links.append(line[0])
                 elif xEnd > 60:
-                    print("Rechts")
+                    #print("Rechts")
                     rechts.append(line[0])
+
         if len(rechts) == 1:
             rdurch = rechts
-            print(rdurch)
+            #print(rdurch)
             alpha2 = np.arctan((rdurch[0][3]-rdurch[0][1])/(rdurch[0][2]-rdurch[0][0]))
             alpha2 = np.degrees(alpha2)
-            print(f"Alpha2 {alpha2}")
+            #print(f"Alpha2 {alpha2}")
         elif len(rechts) >= 2:
             rdurch = np.mean(rechts, axis=0, keepdims=False) #muss noch parameter angepasst werden
             #(rechts[0] + rechts[1])/2
-            print(rdurch)
+            #print(rdurch)
             alpha2 = np.arctan((rdurch[3]-rdurch[1])/(rdurch[2]-rdurch[0]))
             alpha2 = np.degrees(alpha2)
-            print(f"Alpha2 {alpha2}")
+            #print(f"Alpha2 {alpha2}")
         else:
-            print("no right lane")
+            #print("no right lane")
             alpha2 = 60 # muss noch überprüft werden
 
         #mit einer linie probieren
         if len(links) == 1:
             ldurch = links 
-            print(f"Ldurch {ldurch}")
+            #print(f"Ldurch {ldurch}")
             alpha = np.arctan((ldurch[0][3]-ldurch[0][1])/(ldurch[0][2]-ldurch[0][0]))
             alpha = abs(np.degrees(alpha))
-            print(f"Alpha {alpha}")
+            #print(f"Alpha {alpha}")
         elif len(links) >= 2:
             ldurch = np.mean(links, axis=0, keepdims=False)
-            print(f"Ldurch {ldurch}")
+            #print(f"Ldurch {ldurch}")
             alpha = np.arctan((ldurch[3]-ldurch[1])/(ldurch[2]-ldurch[0]))
             alpha = abs(np.degrees(alpha))
-            print(f"Alpha {alpha}")
+            #print(f"Alpha {alpha}")
         else:
-            print("no left lane")
+            #print("no left lane")
             alpha = 60 # muss noch überprüft werden
 
         # Berechnung des Lenkwinkels
@@ -131,7 +132,7 @@ class CameraCar(BaseCar):
             alpha2 = 90 + alpha2 + 90
 
         diffangle = 90 + (alpha2-alpha) # vielleicht muss mit Betrag (Vorzeichen) bearbeitet werden
-        print(f"Diffwinkel   {diffangle}")
+        #print(f"Diffwinkel   {diffangle}")
 
         return int(diffangle)
 
@@ -145,7 +146,7 @@ class CameraCar(BaseCar):
             picture_path = f"/home/pi/Desktop/git/C2C_PP_02/pictures/Bild_{self.index}_{int_angle}.jpg"
             
         cv2.imwrite(picture_path, frame)
-        print(self.index)
+        #print(self.index)
         self.index += 1
             
         
@@ -244,11 +245,12 @@ class CameraCar(BaseCar):
 # funktioniert noch nicht
     def _modus1(self):
         self.farb_config()
-        self.drive(30,90)
-        
+        self.drive(30, 90)
+        print("Vor der Schleife")
         while self.is_driving:
-            self.drive(new_angle=self.steering_angle)
-            self.save_picture(self.frame, self.steering_angle)
+            print("In der Schleife: ", self.steering_angle)
+            #self.drive(new_angle=self.steering_angle)
+            #self.save_picture(self.frame, self.steering_angle)
 
         self.stop()
         print("Die Fahrt ist beendet")
