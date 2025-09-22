@@ -48,62 +48,69 @@ class CameraCar(BaseCar):
             print(f"Upper: {self.upper_blue_input}, Lower: {self.lower_blue_input}")
 
 # werden die Bilder verarbeitet
-    def picture_handler(self):
-        self.index += 1
-        img = self.camera.get_frame()
-        self.camera.release()
-        #muss noch angepasst werden, wegen Dateien Benennung Ziel: Bild0x_Winkel_Grad
-        cv2.imwrite("/home/pi/Desktop/git/C2C_PP_02/pictures/Bild.jpg", img)
-        # cv2.imwrite("Bild.jpg", img)
-        img_read = cv2.imread("/home/pi/Desktop/git/C2C_PP_02/pictures/Bild.jpg")
-        img_small = cv2.resize(img_read, None, fx=0.25, fy=0.25) # 50% prozent vom originalen Bild, fx, fy als parameter
-        cv2.imwrite("/home/pi/Desktop/git/C2C_PP_02/pictures/Bild_small.jpg", img_small)
-        print(img_small.shape)
-        img_cropped = img_small.copy()[40:90, :, :] #40:90 und 20:150 als variablen oder einstellbar
-        cv2.imwrite("/home/pi/Desktop/git/C2C_PP_02/pictures/Bild_cropped.jpg", img_cropped)
-        hsv = cv2.cvtColor(img_cropped,cv2.COLOR_BGR2HSV)
-        print(hsv.shape)
-        lower_blue = self.lower_blue_input
-        print(lower_blue)
-        upper_blue = self.upper_blue_input
-        print(upper_blue)
-        img_filtered = cv2.inRange(hsv, lower_blue, upper_blue)
-        img_edges = cv2.Canny(img_filtered, 900, 1000)
-        lines = cv2.HoughLinesP(img_edges,  1, np.pi / 180, threshold=30, minLineLength=25, maxLineGap=10) # extern Input ?
-        #zu entscheiden, welche angpasst Bild soll gespecihert werden
-        cv2.imwrite("/home/pi/Desktop/git/C2C_PP_02/pictures_modified/Bild_angepasst.jpg", img_edges)
-        print(lines)
-        return lines, img
-        #plt.imshow(img)
+    # def picture_handler(self):
+    #     self.index += 1
+    #     img = self.camera.get_frame()
+    #     self.camera.release()
+    #     #muss noch angepasst werden, wegen Dateien Benennung Ziel: Bild0x_Winkel_Grad
+    #     cv2.imwrite("/home/pi/Desktop/git/C2C_PP_02/pictures/Bild.jpg", img)
+    #     # cv2.imwrite("Bild.jpg", img)
+    #     img_read = cv2.imread("/home/pi/Desktop/git/C2C_PP_02/pictures/Bild.jpg")
+    #     img_small = cv2.resize(img_read, None, fx=0.25, fy=0.25) # 50% prozent vom originalen Bild, fx, fy als parameter
+    #     cv2.imwrite("/home/pi/Desktop/git/C2C_PP_02/pictures/Bild_small.jpg", img_small)
+    #     print(img_small.shape)
+    #     img_cropped = img_small.copy()[60:90, :, :] #40:90 und 20:150 als variablen oder einstellbar
+    #     cv2.imwrite("/home/pi/Desktop/git/C2C_PP_02/pictures/Bild_cropped.jpg", img_cropped)
+    #     hsv = cv2.cvtColor(img_cropped,cv2.COLOR_BGR2HSV)
+    #     print(hsv.shape)
+    #     lower_blue = self.lower_blue_input
+    #     print(lower_blue)
+    #     upper_blue = self.upper_blue_input
+    #     print(upper_blue)
+    #     img_filtered = cv2.inRange(hsv, lower_blue, upper_blue)
+    #     img_edges = cv2.Canny(img_filtered, 900, 1000)
+    #     lines = cv2.HoughLinesP(img_edges,  1, np.pi / 180, threshold=30, minLineLength=25, maxLineGap=10) # extern Input ?
+    #     #zu entscheiden, welche angpasst Bild soll gespecihert werden
+    #     cv2.imwrite("/home/pi/Desktop/git/C2C_PP_02/pictures_modified/Bild_angepasst.jpg", img_edges)
+    #     print(lines)
+    #     return lines, img
+    #     #plt.imshow(img)
 
  # lenkwinkel berechnen und zurückgeben       
-    def angle_calc(self, lines):
+    def angle_calc(self, lines, x_coord_left=55, x_coord_right=85):
         rechts = []
         links = []
+        
         if lines is not None:
             for line in lines:
                 xEnd, yEnd, xStart, yStart = line[0]
                 
-                if xEnd < 60:
+                if xEnd < x_coord_left:
                     #print("Links")
                     links.append(line[0])
-                elif xEnd > 60:
+                elif xEnd > x_coord_right:
                     #print("Rechts")
                     rechts.append(line[0])
 
         if len(rechts) == 1:
             rdurch = rechts
+            if rdurch[0][2]-rdurch[0][0] != 0:
             #print(rdurch)
-            alpha2 = np.arctan((rdurch[0][3]-rdurch[0][1])/(rdurch[0][2]-rdurch[0][0]))
-            alpha2 = np.degrees(alpha2)
-            #print(f"Alpha2 {alpha2}")
+                alpha2 = np.arctan((rdurch[0][3]-rdurch[0][1])/(rdurch[0][2]-rdurch[0][0]))
+                alpha2 = np.degrees(alpha2)
+                #print(f"Alpha2 {alpha2}")
+            else:
+                alpha2 = 60 # muss noch überprüft werden
         elif len(rechts) >= 2:
             rdurch = np.mean(rechts, axis=0, keepdims=False) #muss noch parameter angepasst werden
             #(rechts[0] + rechts[1])/2
             #print(rdurch)
-            alpha2 = np.arctan((rdurch[3]-rdurch[1])/(rdurch[2]-rdurch[0]))
-            alpha2 = np.degrees(alpha2)
-            #print(f"Alpha2 {alpha2}")
+            if rdurch[2]-rdurch[0] != 0:
+                alpha2 = np.arctan((rdurch[3]-rdurch[1])/(rdurch[2]-rdurch[0]))
+                alpha2 = np.degrees(alpha2)
+                #print(f"Alpha2 {alpha2}")
+            else:
+                alpha2 = 60 # muss noch überprüft werden
         else:
             #print("no right lane")
             alpha2 = 60 # muss noch überprüft werden
@@ -111,27 +118,38 @@ class CameraCar(BaseCar):
         #mit einer linie probieren
         if len(links) == 1:
             ldurch = links 
+            if ldurch[0][2]-ldurch[0][0] != 0:
             #print(f"Ldurch {ldurch}")
-            alpha = np.arctan((ldurch[0][3]-ldurch[0][1])/(ldurch[0][2]-ldurch[0][0]))
-            alpha = abs(np.degrees(alpha))
+                alpha = np.arctan((ldurch[0][3]-ldurch[0][1])/(ldurch[0][2]-ldurch[0][0]))
+                alpha = abs(np.degrees(alpha))
             #print(f"Alpha {alpha}")
+            else:
+            #print("no left lane")
+                alpha = 60 # muss noch überprüft werden
         elif len(links) >= 2:
             ldurch = np.mean(links, axis=0, keepdims=False)
-            #print(f"Ldurch {ldurch}")
-            alpha = np.arctan((ldurch[3]-ldurch[1])/(ldurch[2]-ldurch[0]))
-            alpha = abs(np.degrees(alpha))
+            if ldurch[2]-ldurch[0] != 0:
+                alpha = np.arctan((ldurch[3]-ldurch[1])/(ldurch[2]-ldurch[0]))
+                alpha = abs(np.degrees(alpha))
             #print(f"Alpha {alpha}")
+            else:
+            #print("no left lane")
+                alpha = 60 # muss noch überprüft werden
         else:
             #print("no left lane")
             alpha = 60 # muss noch überprüft werden
 
         # Berechnung des Lenkwinkels
         if alpha < 0:
-            alpha = 90 + alpha + 90
+            alpha = 180 + alpha 
         if alpha2 < 0:
-            alpha2 = 90 + alpha2 + 90
+            alpha2 = 180 + alpha2 
 
-        diffangle = 90 + (alpha2-alpha) # vielleicht muss mit Betrag (Vorzeichen) bearbeitet werden
+        if any(np.isnan([alpha, alpha2])):
+            diffangle = 90
+        else:
+            diffangle = 90 + (alpha2 - alpha) # vielleicht muss mit Betrag (Vorzeichen) bearbeitet werden
+        #print("Test:", alpha, alpha2, diffangle)
         #print(f"Diffwinkel   {diffangle}")
 
         return int(diffangle)
@@ -206,16 +224,19 @@ class CameraCar(BaseCar):
 
             
     def video_streams_lines(self): 
+        upper_boundary = 50
         while True: 
-            video_line = self.frame.copy()[40:90, :, :] #40:90 und 20:150 als variablen oder einstellbar
+            video_line = self.frame.copy()[upper_boundary:90, :, :] #40:90 und 20:150 als variablen oder einstellbar
             # video_hsv = cv2.cvtColor(video_cropped,cv2.COLOR_BGR2HSV)
             # lower_blue = self.lower_blue_input
             # upper_blue = self.upper_blue_input
             # video_filtered = cv2.inRange(video_hsv, lower_blue, upper_blue)
             # video_edges = cv2.Canny(video_filtered, 50, 100)
-            lines = cv2.HoughLinesP(self.canny[40:90,:],  1, np.pi / 180, threshold=15, minLineLength=7, maxLineGap=5)   
+            lines = cv2.HoughLinesP(self.canny[upper_boundary:90,:],  1, np.pi / 180, threshold=30, minLineLength=20, maxLineGap=10)
+
             angel = self.angle_calc(lines)
             self.steering_angle = angel
+            print("IM STREAM: ", self.steering_angle, angel)
             video_line = cv2.putText(video_line, str(angel), (10,20), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
             if lines is not None:
                 for line in lines:
@@ -245,7 +266,7 @@ class CameraCar(BaseCar):
 # funktioniert noch nicht
     def _modus1(self):
         self.farb_config()
-        self.drive(30, 90)
+        self.drive(-30, 90)
         print("Vor der Schleife")
         while self.is_driving:
             print("In der Schleife: ", self.steering_angle)

@@ -25,13 +25,15 @@ class BaseCar:
     
     @steering_angle.setter
     def steering_angle(self, angle):
+        off = self.front._turning_offset 
         if angle < 45:
-            self.__steering_angle = 45
+            self.front.turn(45)
         elif angle > 135:
-            self.__steering_angle = 135
+            self.front.turn(135)
         else:
-            self.__steering_angle = angle 
-
+            self.__steering_angle = angle
+            self.front.turn(self.__steering_angle)
+     
     @property
     def speed(self):
         #print(self.__speed)
