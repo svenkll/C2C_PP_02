@@ -18,10 +18,9 @@ class CameraCar(BaseCar):
         self.index = 0
         self.upper_blue_input = np.array([90, 60, 60])
         self.lower_blue_input = np.array([130, 255, 255])
-        self.steering_a = 90
         self.hsv = np.zeros_like(self.frame)[:,:,0]
         self.canny = np.zeros_like(self.frame)[:,:,0]
-        self.is_driving=False
+        self.is_driving = False
         # upper_blue_input in die init für die slider bei Dash // funktionen anpassen auf self. upper
         # lower_blue_input in die init für die slider bei Dash
         print("CameraCar erzeugt")
@@ -136,11 +135,16 @@ class CameraCar(BaseCar):
 
         return int(diffangle)
 
-    def save_picture(self, img, diffangle):
-        #picture_index = self.index #??
+
+    def save_picture(self, frame, diffangle):
+        
         int_angle = int(diffangle)
-        picture_path = f"/home/pi/Desktop/git/C2C_PP_02/pictures/Bild_{self.index}_{int_angle}.jpg"
-        cv2.imwrite(picture_path, img)
+        if int_angle < 100:
+            picture_path = f"/home/pi/Desktop/git/C2C_PP_02/pictures/Bild_{self.index}_0{int_angle}.jpg"
+        else:
+            picture_path = f"/home/pi/Desktop/git/C2C_PP_02/pictures/Bild_{self.index}_{int_angle}.jpg"
+            
+        cv2.imwrite(picture_path, frame)
         print(self.index)
         self.index += 1
             
@@ -169,6 +173,7 @@ class CameraCar(BaseCar):
     def video_streams(self):
         while True:
             frame = self.frame
+            self.save_picture(frame, self.steering_angle)
             # self.frame = cv2.resize(self.cam.get_frame(), None, fx=0.25, fy=0.25)
             hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
             lower_blue = self.lower_blue_input
@@ -240,24 +245,16 @@ class CameraCar(BaseCar):
     def _modus1(self):
         self.farb_config()
         self.drive(30,90)
-        self.is_driving = True # oder als kill switch im Dash
+        
         while self.is_driving:
-            frame_as_string, lines = self.video_streams_lines()
-            diffangle = self.angle_calc(lines)
-            self.drive(new_angle=diffangle)
-            self.save_picture(img, diffangle)
-            #time.sleep(0.2)
-            i +=1
+            self.drive(new_angle=self.steering_angle)
+            self.save_picture(self.frame, self.steering_angle)
+
         self.stop()
         print("Die Fahrt ist beendet")
         
         
-        
-        
-        
-        
-        
-   
+
 if __name__ == "__main__":
 
     front = FrontWheels()
