@@ -73,7 +73,8 @@ app.layout = html.Div([
     dbc.Row([
         dbc.Col([dbc.Button("Fahrmodus manual starten", id="btn-mode1", color="primary")]),
         dbc.Col([dbc.Button("Fahrmodus CNN starten", id="btn-mode2", color="secondary")]),
-        dbc.Col([dbc.Button("Daten speichern", id="btn-save", color="success")])
+        dbc.Col([dbc.Button("Daten speichern", id="btn-save", color="success")]),
+        dbc.Col([dbc.Switch(id="switch-armed", label="Motor Armed", value=False)])
     ]),
 
     html.Div(id="status-text", style={"marginTop": "20px", "fontWeight": "bold"})
@@ -96,6 +97,23 @@ def update_div_1(h_input, s_input, v_input):
     proc.upper_blue_input = np.array([h_up, s_up, v_up])
     return f"H: {h_input} | S: {s_input} | V: {v_input}"
 
+
+@app.callback(
+    Output("status-text", "children", allow_duplicate=True),
+    Input("switch-armed", "value"),
+    prevent_initial_call=True
+)
+
+
+def toggle_motor(armed):
+    if armed:
+        proc.motor_armed = True
+        return "Motor Status: ✅ Armed"
+    else:
+        proc.motor_armed = False
+        proc.stop()
+        return "Motor Status: ⛔ Unarmed"
+
 # --------------------------
 # Button Callback (Dash 2.9 kompatibel)
 # --------------------------
@@ -108,6 +126,7 @@ def update_div_1(h_input, s_input, v_input):
     State("s-slider", "value"),
     State("v-slider", "value"),
     prevent_initial_call=True
+    
 )
 def handle_buttons(mode1_clicks, mode2_clicks, save_clicks, h_val, s_val, v_val):
     ctx = callback_context
@@ -118,10 +137,14 @@ def handle_buttons(mode1_clicks, mode2_clicks, save_clicks, h_val, s_val, v_val)
     button_id = ctx.triggered[0]['prop_id'].split('.')[0]
 
     if button_id == "btn-mode1":
+        if not proc.is_driving:
+            return "⚠️ Motor ist Unarmed!"
         proc.start_mode(1)  # Muss in CameraCar implementiert sein
         return "Fahrmodus manual gestartet!"
 
     elif button_id == "btn-mode2":
+        if not proc.is_driving:
+            return "⚠️ Motor ist Unarmed!"
         proc.start_mode(2)
         return "Fahrmodus CNN gestartet!"
 
@@ -129,7 +152,8 @@ def handle_buttons(mode1_clicks, mode2_clicks, save_clicks, h_val, s_val, v_val)
         h_low, h_up = h_val
         s_low, s_up = s_val
         v_low, v_up = v_val
-
+    
+    elif button_id == "btn-trigger":
         data = load_config()
         data["lower_blue_input"] = [h_low, s_low, v_low]
         data["upper_blue_input"] = [h_up, s_up, v_up]

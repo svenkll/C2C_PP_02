@@ -21,7 +21,7 @@ class CameraCar(BaseCar):
         self.steering_a = 90
         self.hsv = np.zeros_like(self.frame)[:,:,0]
         self.canny = np.zeros_like(self.frame)[:,:,0]
-        self.is_driving=
+        self.is_driving=False
         # upper_blue_input in die init für die slider bei Dash // funktionen anpassen auf self. upper
         # lower_blue_input in die init für die slider bei Dash
         print("CameraCar erzeugt")
