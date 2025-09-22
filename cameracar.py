@@ -14,10 +14,14 @@ class CameraCar(BaseCar):
         super().__init__(front, back, values_to_log)
         self.camera = camera
         #??? liefert Video oder bilder zurück
-        self.frame = self.camera.get_frame()
+        self.frame = cv2.resize(self.camera.get_frame(), None, fx=0.25, fy=0.25)
         self.index = 0
         self.upper_blue_input = np.array([90, 60, 60])
         self.lower_blue_input = np.array([130, 255, 255])
+        self.steering_a = 90
+        self.hsv = np.zeros_like(self.frame)[:,:,0]
+        self.canny = np.zeros_like(self.frame)[:,:,0]
+        self.is_driving=
         # upper_blue_input in die init für die slider bei Dash // funktionen anpassen auf self. upper
         # lower_blue_input in die init für die slider bei Dash
         print("CameraCar erzeugt")
@@ -143,22 +147,22 @@ class CameraCar(BaseCar):
         
         
         
-    def video_handler(self):
-        #angepasst mit while true
-        #while True:
-            video_stream = self.camera.get_frame()
-            #img = video_stream
-            video_small = cv2.resize(video_stream, None, fx=0.25, fy=0.25) # 50% prozent vom originalen Bild, fx, fy als parameter
-            video_cropped = video_small.copy()[40:90, :, :] #40:90 und 20:150 als variablen oder einstellbar
-            video_hsv = cv2.cvtColor(video_cropped,cv2.COLOR_BGR2HSV)
-            lower_blue = self.lower_blue_input
-            upper_blue = self.upper_blue_input
-            video_filtered = cv2.inRange(video_hsv, lower_blue, upper_blue)
-            video_edges = cv2.Canny(video_filtered, 900, 1000)
-            lines = cv2.HoughLinesP(video_edges,  1, np.pi / 180, threshold=30, minLineLength=25, maxLineGap=10)
+    # def video_handler(self):
+    #     #angepasst mit while true
+    #     #while True:
+    #         video_stream = self.camera.get_frame()
+    #         #img = video_stream
+    #         video_small = cv2.resize(video_stream, None, fx=0.25, fy=0.25) # 50% prozent vom originalen Bild, fx, fy als parameter
+    #         video_cropped = video_small.copy()[40:90, :, :] #40:90 und 20:150 als variablen oder einstellbar
+    #         video_hsv = cv2.cvtColor(video_cropped,cv2.COLOR_BGR2HSV)
+    #         lower_blue = self.lower_blue_input
+    #         upper_blue = self.upper_blue_input
+    #         video_filtered = cv2.inRange(video_hsv, lower_blue, upper_blue)
+    #         video_edges = cv2.Canny(video_filtered, 900, 1000)
+    #         lines = cv2.HoughLinesP(video_edges,  1, np.pi / 180, threshold=30, minLineLength=25, maxLineGap=10)
             
-            return lines
-            #self.frame = self.camera.get_frame()
+    #         return lines
+    #         #self.frame = self.camera.get_frame()
         
         
         
@@ -169,8 +173,8 @@ class CameraCar(BaseCar):
             hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
             lower_blue = self.lower_blue_input
             upper_blue = self.upper_blue_input
-            filtered = cv2.inRange(hsv, lower_blue, upper_blue)
-            _, frame_as_jpeg = cv2.imencode(".jpeg", filtered)
+            self.hsv = cv2.inRange(hsv, lower_blue, upper_blue)
+            _, frame_as_jpeg = cv2.imencode(".jpeg", self.hsv)
             frame_in_bytes = frame_as_jpeg.tobytes()
 
             frame_as_string = (b'--frame\r\n'
@@ -178,42 +182,35 @@ class CameraCar(BaseCar):
 
             yield frame_as_string
             
-            self.frame = self.camera.get_frame()
+            self.frame = cv2.resize(self.camera.get_frame(), None, fx=0.25, fy=0.25)
             
             
     
     def video_streams_Canny(self):
         while True:
-            canny = self.frame
-            # self.frame = cv2.resize(self.cam.get_frame(), None, fx=0.25, fy=0.25)
-            hsv = cv2.cvtColor(canny, cv2.COLOR_BGR2HSV)
-            lower_blue = self.lower_blue_input
-            upper_blue = self.upper_blue_input
-            filtered = cv2.inRange(hsv, lower_blue, upper_blue)
-            video_edges = cv2.Canny(filtered, 900, 1000)
-            _, frame_as_jpeg = cv2.imencode(".jpeg", video_edges)
+
+            self.canny = cv2.Canny(self.hsv, 100, 200)
+            _, frame_as_jpeg = cv2.imencode(".jpeg", self.canny)
             frame_in_bytes = frame_as_jpeg.tobytes()
 
             frame_as_string = (b'--frame\r\n'
                 b'Content-Type: image/jpeg\r\n\r\n' + frame_in_bytes + b'\r\n\r\n')
 
             yield frame_as_string
-            # self.frame = self.camera.get_frame()
+
             
     def video_streams_lines(self): 
         while True: 
-            video_stream = self.frame
-            video_small = cv2.resize(video_stream, None, fx=0.25, fy=0.25) # 50% prozent vom originalen Bild, fx, fy als parameter
-            video_cropped = video_small.copy()[40:90, :, :] #40:90 und 20:150 als variablen oder einstellbar
-            video_hsv = cv2.cvtColor(video_cropped,cv2.COLOR_BGR2HSV)
-            lower_blue = self.lower_blue_input
-            upper_blue = self.upper_blue_input
-            video_filtered = cv2.inRange(video_hsv, lower_blue, upper_blue)
-            video_edges = cv2.Canny(video_filtered, 50, 100)
-            lines = cv2.HoughLinesP(video_edges,  1, np.pi / 180, threshold=30, minLineLength=15, maxLineGap=10)
-            video_line = video_cropped.copy()    
+            video_line = self.frame.copy()[40:90, :, :] #40:90 und 20:150 als variablen oder einstellbar
+            # video_hsv = cv2.cvtColor(video_cropped,cv2.COLOR_BGR2HSV)
+            # lower_blue = self.lower_blue_input
+            # upper_blue = self.upper_blue_input
+            # video_filtered = cv2.inRange(video_hsv, lower_blue, upper_blue)
+            # video_edges = cv2.Canny(video_filtered, 50, 100)
+            lines = cv2.HoughLinesP(self.canny[40:90,:],  1, np.pi / 180, threshold=15, minLineLength=7, maxLineGap=5)   
             angel = self.angle_calc(lines)
-            video_line = cv2.putText(video_line, str(angel), (10,10), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
+            self.steering_angle = angel
+            video_line = cv2.putText(video_line, str(angel), (10,20), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
             if lines is not None:
                 for line in lines:
                     x1, y1, x2, y2 = line[0]
@@ -223,9 +220,11 @@ class CameraCar(BaseCar):
 
             frame_as_string = (b'--frame\r\n'
                 b'Content-Type: image/jpeg\r\n\r\n' + frame_in_bytes + b'\r\n\r\n')
+            # print(len(frame_as_string))
+            # print(angel)
 
             yield frame_as_string
-            # self.frame = self.camera.get_frame()
+
 
 # funktioniert noch nicht
     def start_mode(self, mode: int):
@@ -241,9 +240,9 @@ class CameraCar(BaseCar):
     def _modus1(self):
         self.farb_config()
         self.drive(30,90)
-        i = 0
-        while i < 260:
-            lines, img = self.video_handler()
+        self.is_driving = True # oder als kill switch im Dash
+        while self.is_driving:
+            frame_as_string, lines = self.video_streams_lines()
             diffangle = self.angle_calc(lines)
             self.drive(new_angle=diffangle)
             self.save_picture(img, diffangle)
@@ -275,17 +274,14 @@ if __name__ == "__main__":
 
     cam_car = CameraCar(front,back,cam, [])
     cam_car.farb_config()
-    cam_car.drive(30,90)
-    i = 0
-    while i < 250:
-        lines = cam_car.video_handler()
-        print(lines)
-        diffangle = cam_car.angle_calc(lines)        
-        cam_car.drive(new_angle=diffangle)
+    # cam_car.drive(30,90)
+    lines, frame = cam_car.video_streams_lines()
+    print(lines)
+        # print(lines)
+        # diffangle = cam_car.angle_calc(lines)        
+        # cam_car.drive(new_angle=diffangle)
         #cam_car.save_picture(img, diffangle)
         #time.sleep(0.1)
-        i +=1 
-    cam_car.stop()
 
 
     # lines, img = cam_car.picture_handler()

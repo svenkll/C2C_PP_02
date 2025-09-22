@@ -53,10 +53,9 @@ config = load_config()
 app.layout = html.Div([
     dbc.Row([
         dbc.Col([html.Div("Hallo", id="div-1")]),
-        dbc.Col([html.Div(html.Img(src="/video_stream"))]),
-        dbc.Col([html.Div(html.Img(src="/video_stream_Canny"))]),
-        dbc.Col([html.Div(html.Img(src="/video_stream_line"),
-                          style={"width": "800px", "height": "600px"})])
+        dbc.Col([html.Div(html.Img(src="/video_stream", width="400", height="300"))]),
+        dbc.Col([html.Div(html.Img(src="/video_stream_Canny", width="400", height="300"))]),
+        dbc.Col([html.Div(html.Img(src="/video_stream_line", width="400", height="300"))])
     ]),
 
     dbc.Row([
