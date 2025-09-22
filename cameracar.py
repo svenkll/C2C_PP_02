@@ -173,7 +173,7 @@ class CameraCar(BaseCar):
     def video_streams(self):
         while True:
             frame = self.frame
-            self.save_picture(frame, self.steering_angle)
+            # self.save_picture(frame, self.steering_angle)
             # self.frame = cv2.resize(self.cam.get_frame(), None, fx=0.25, fy=0.25)
             hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
             lower_blue = self.lower_blue_input
