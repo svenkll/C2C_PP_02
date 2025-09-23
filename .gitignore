@@ -10,3 +10,5 @@ dash_testing_jk.py
 pictures/
 pictures_modified/
 __pycache__/
+live_model*
+tf*
