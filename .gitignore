@@ -10,3 +10,4 @@ dash_testing_jk.py
 pictures/
 pictures_modified/
 __pycache__/
+tf*
