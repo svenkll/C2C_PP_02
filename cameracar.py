@@ -159,9 +159,9 @@ class CameraCar(BaseCar):
         
         int_angle = int(diffangle)
         if int_angle < 100:
-            picture_path = f"/home/pi/Camp2Code/C2C-PP02/C2C_PP_02/pictures/Bild_{self.index}_0{int_angle}.jpg"
+            picture_path = f"/home/pi/Desktop/git/C2C_PP_02/pictures/Bild_{self.index}_0{int_angle}.jpg"
         else:
-            picture_path = f"/home/pi/Camp2Code/C2C-PP02/C2C_PP_02/pictures/Bild_{self.index}_{int_angle}.jpg"
+            picture_path = f"/home/pi/Desktop/git/C2C_PP_02/pictures/Bild_{self.index}_{int_angle}.jpg"
             
         print("Bild gespeichert", self.index)
         cv2.imwrite(picture_path, frame)
