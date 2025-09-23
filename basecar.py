@@ -32,7 +32,7 @@ class BaseCar:
             self.front.turn(135)
         else:
             self.__steering_angle = angle
-            self.front.turn(self.__steering_angle)
+            self.front.turn(self.__steering_angle+off)
      
     @property
     def speed(self):

@@ -10,7 +10,7 @@ from basisklassen_cam import Camera
 # --------------------------
 # Kamera und Car Setup
 # --------------------------
-front = FrontWheels(-20)
+front = FrontWheels()
 back = BackWheels()
 cam = Camera(devicenumber=0,
              buffersize=10,
