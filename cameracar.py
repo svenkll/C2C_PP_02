@@ -159,10 +159,11 @@ class CameraCar(BaseCar):
         
         int_angle = int(diffangle)
         if int_angle < 100:
-            picture_path = f"/home/pi/Desktop/git/C2C_PP_02/pictures/Bild_{self.index}_0{int_angle}.jpg"
+            picture_path = f"/home/pi/Camp2Code/C2C-PP02/C2C_PP_02/pictures/Bild_{self.index}_0{int_angle}.jpg"
         else:
-            picture_path = f"/home/pi/Desktop/git/C2C_PP_02/pictures/Bild_{self.index}_{int_angle}.jpg"
+            picture_path = f"/home/pi/Camp2Code/C2C-PP02/C2C_PP_02/pictures/Bild_{self.index}_{int_angle}.jpg"
             
+        print("Bild gespeichert", self.index)
         cv2.imwrite(picture_path, frame)
         #print(self.index)
         self.index += 1
@@ -224,7 +225,7 @@ class CameraCar(BaseCar):
 
             
     def video_streams_lines(self): 
-        upper_boundary = 50
+        upper_boundary = 40
         while True: 
             video_line = self.frame.copy()[upper_boundary:90, :, :] #40:90 und 20:150 als variablen oder einstellbar
             # video_hsv = cv2.cvtColor(video_cropped,cv2.COLOR_BGR2HSV)
@@ -236,7 +237,7 @@ class CameraCar(BaseCar):
 
             angel = self.angle_calc(lines)
             self.steering_angle = angel
-            print("IM STREAM: ", self.steering_angle, angel)
+            #print("IM STREAM: ", self.steering_angle, angel)
             video_line = cv2.putText(video_line, str(angel), (10,20), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
             if lines is not None:
                 for line in lines:
@@ -266,12 +267,13 @@ class CameraCar(BaseCar):
 # funktioniert noch nicht
     def _modus1(self):
         self.farb_config()
-        self.drive(-30, 90)
+        #self.drive(30, 90)
         print("Vor der Schleife")
         while self.is_driving:
             print("In der Schleife: ", self.steering_angle)
             #self.drive(new_angle=self.steering_angle)
-            #self.save_picture(self.frame, self.steering_angle)
+            self.save_picture(self.frame, self.steering_angle)
+            time.sleep(0.2)
 
         self.stop()
         print("Die Fahrt ist beendet")
