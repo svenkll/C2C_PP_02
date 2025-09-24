@@ -21,6 +21,8 @@ class CameraCar(BaseCar):
         self.hsv = np.zeros_like(self.frame)[:,:,0]
         self.canny = np.zeros_like(self.frame)[:,:,0]
         self.is_driving = False
+        self.CNN_active = False
+        self.angle_calc_CNN_ini("/home/pi/Desktop/git/C2C_PP_02/live_model_Vic_alle_fp32.tflite")
         # upper_blue_input in die init für die slider bei Dash // funktionen anpassen auf self. upper
         # lower_blue_input in die init für die slider bei Dash
         print("CameraCar erzeugt")
@@ -46,6 +48,21 @@ class CameraCar(BaseCar):
             
             print("Daten in config.json:")
             print(f"Upper: {self.upper_blue_input}, Lower: {self.lower_blue_input}")
+            
+            
+    def angle_calc_CNN_ini(self, path):
+        self.interpreter = tflite.Interpreter(model_path=path)
+        self.interpreter.allocate_tensors()
+        self.input_details = self.interpreter.get_input_details()
+        self.output_details = self.interpreter.get_output_details()
+
+    def angle_calc_CNN(self, img):
+        self.interpreter.set_tensor(self.input_details[0]['index'], img)
+        self.interpreter.invoke()
+        output_data = self.interpreter.get_tensor(self.output_details[0]['index'])
+        angle = int(output_data[0][0])
+        return angle
+        
 
 # werden die Bilder verarbeitet
     # def picture_handler(self):
@@ -234,9 +251,14 @@ class CameraCar(BaseCar):
             # video_filtered = cv2.inRange(video_hsv, lower_blue, upper_blue)
             # video_edges = cv2.Canny(video_filtered, 50, 100)
             lines = cv2.HoughLinesP(self.canny[upper_boundary:90,:],  1, np.pi / 180, threshold=30, minLineLength=20, maxLineGap=10)
-
-            angel = self.angle_calc(lines)
-            self.steering_angle = angel
+            if self.CNN_active:
+                img = video_line
+                img = cv2.resize(img, (128, 128)).astype(np.float32)/255
+                img = np.expand_dims(img, axis=0)
+                angel = self.angle_calc_CNN(img)
+            else:
+                angel = self.angle_calc(lines)
+                self.steering_angle = angel
             #print("IM STREAM: ", self.steering_angle, angel)
             video_line = cv2.putText(video_line, str(angel), (10,20), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
             if lines is not None:

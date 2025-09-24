@@ -3,7 +3,7 @@ import dash_bootstrap_components as dbc
 from flask import Flask, Response
 import json
 import numpy as np
-from cameracar import CameraCar
+from cameracar_jk import CameraCar
 from basisklassen import FrontWheels, BackWheels
 from basisklassen_cam import Camera
 
@@ -74,7 +74,8 @@ app.layout = html.Div([
         dbc.Col([dbc.Button("Fahrmodus manual starten", id="btn-mode1", color="primary")]),
         dbc.Col([dbc.Button("Fahrmodus CNN starten", id="btn-mode2", color="secondary")]),
         dbc.Col([dbc.Button("Daten speichern", id="btn-save", color="success")]),
-        dbc.Col([dbc.Switch(id="switch-armed", label="Motor Armed", value=False)])
+        dbc.Col([dbc.Switch(id="switch-armed", label="Motor Armed", value=False)]),
+        dbc.Col([dbc.Switch(id="switch-Calc", label="Calc", value=False)]),
     ]),
 
     html.Div(id="status-text", style={"marginTop": "20px", "fontWeight": "bold"})
@@ -105,6 +106,13 @@ def update_div_1(h_input, s_input, v_input):
 )
 
 
+@app.callback(
+    Output("status-text", "children", allow_duplicate=True),
+    Input("switch-Calc", "value"),
+    prevent_initial_call=True
+)
+
+
 def toggle_motor(armed):
     if armed:
         proc.is_driving = True
@@ -113,6 +121,14 @@ def toggle_motor(armed):
         proc.is_driving = False
         proc.stop()
         return "Motor Status: ⛔ Unarmed"
+
+def CNN_active(toggle):
+    if toggle:
+        proc.CNN_active = True
+        return "CNN Calc: ✅ Active"
+    else:
+        proc.CNN_active = False
+        return "CNN Calc: ⛔ Inactive"
 
 # --------------------------
 # Button Callback (Dash 2.9 kompatibel)
