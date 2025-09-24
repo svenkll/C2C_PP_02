@@ -3,7 +3,7 @@ import dash_bootstrap_components as dbc
 from flask import Flask, Response
 import json
 import numpy as np
-from cameracar_jk import CameraCar
+from cameracar import CameraCar
 from basisklassen import FrontWheels, BackWheels
 from basisklassen_cam import Camera
 
