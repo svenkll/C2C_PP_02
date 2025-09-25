@@ -51,10 +51,16 @@ config = load_config()
 # Layout
 # --------------------------
 app.layout = dbc.Container([
+
     dbc.Row([
+        # dbc.Col([html.Div("Werte", id="div-1", style={"width": "100%", "maxWidth": "640px", "height": "auto", "display": "block", "margin": "0 auto"})]),
         dbc.Col([html.Div(html.Img(src="/video_stream", style={"width": "100%", "maxWidth": "640px", "height": "auto", "display": "block", "margin": "0 auto"}))]),
         dbc.Col([html.Div(html.Img(src="/video_stream_Canny", style={"width": "100%", "maxWidth": "640px", "height": "auto", "display": "block", "margin": "0 auto"}))]),
         dbc.Col([html.Div(html.Img(src="/video_stream_line", style={"width": "100%", "maxWidth": "640px", "height": "auto", "display": "block", "margin": "0 auto","marginTop": "100px"}))])
+    ]),
+    
+    dbc.Row([
+        dbc.Col(html.Div("Hallo", id="div-1"), width=12, className="text-center")
     ]),
 
     dbc.Row([
