@@ -170,7 +170,7 @@ def update_div_1(h_input, s_input, v_input):
     prevent_initial_call=True
 )
 def toggle_motor(armed):
-    proc.motor_armed = armed
+    proc.is_driving = armed
     if not armed:
         proc.stop()
     return ("✅ Armed" if armed else "⛔ Unarmed",

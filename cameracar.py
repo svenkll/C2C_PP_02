@@ -23,7 +23,7 @@ class CameraCar(BaseCar):
         self.canny = np.zeros_like(self.frame)[:,:,0]
         self.is_driving = False
         self.CNN_active = False
-        self.angle_calc_CNN_ini("/home/pi/Desktop/git/C2C_PP_02/live_model_Vic_alle_fp32.tflite")
+        self.angle_calc_CNN_ini("/home/pi/Desktop/git/C2C_PP_02/live_model_Jan_fp32.tflite")
         # upper_blue_input in die init für die slider bei Dash // funktionen anpassen auf self. upper
         # lower_blue_input in die init für die slider bei Dash
         print("CameraCar erzeugt")
@@ -302,8 +302,8 @@ class CameraCar(BaseCar):
             # self.save_picture(self.frame, self.steering_angle)
             # time.sleep(0.2)
 
-        self.stop()
-        print("Die Fahrt ist beendet")
+        # self.stop()
+        # print("Die Fahrt ist beendet")
         
         
 
