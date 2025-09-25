@@ -7,6 +7,7 @@ import numpy as np
 import matplotlib.pylab as plt
 import cv2
 import time
+import tflite_runtime.interpreter as tflite
 
 class CameraCar(BaseCar):
 
@@ -256,6 +257,7 @@ class CameraCar(BaseCar):
                 img = cv2.resize(img, (128, 128)).astype(np.float32)/255
                 img = np.expand_dims(img, axis=0)
                 angel = self.angle_calc_CNN(img)
+                self.steering_angle = angel
             else:
                 angel = self.angle_calc(lines)
                 self.steering_angle = angel
