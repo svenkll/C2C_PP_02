@@ -1,4 +1,4 @@
-from dash import Dash, html, dcc, Input, Output, State, callback_context
+from dash import Dash, html, dcc, Input, Output, State, callback_context, no_update
 import dash_bootstrap_components as dbc
 from flask import Flask, Response
 import json
@@ -20,24 +20,24 @@ cam = Camera(devicenumber=0,
              flip=True)
 
 proc = CameraCar(front, back, cam, [])
+proc.motor_armed = False
+proc.CNN_active = False
 
-external_stylesheets = [dbc.themes.BOOTSTRAP]
+external_stylesheets = [dbc.themes.SUPERHERO]
 server = Flask(__name__)
 app = Dash(__name__, external_stylesheets=external_stylesheets, server=server)
 
 # --------------------------
-# Config Loader (robust)
+# Config Loader
 # --------------------------
 def load_config():
     try:
-        with open("C2C_PP_02/config.json", "r") as f:
+        with open("C2C_PP_02/config.json.json", "r") as f:
             data = json.load(f)
-            # Stelle sicher, dass Werte vorhanden sind
             lower = data.get("lower_blue_input", [90,60,60])
             upper = data.get("upper_blue_input", [130,255,180])
             data["lower_blue_input"] = lower
             data["upper_blue_input"] = upper
-            print(f"daten lower {lower} und daten upper {upper}")
     except Exception:
         data = {
             "lower_blue_input": [90, 60, 60],
@@ -50,35 +50,19 @@ config = load_config()
 # --------------------------
 # Layout
 # --------------------------
-app.layout = html.Div([
+app.layout = dbc.Container([
+
+    dbc.Row([
+        # dbc.Col([html.Div("Werte", id="div-1", style={"width": "100%", "maxWidth": "640px", "height": "auto", "display": "block", "margin": "0 auto"})]),
+        dbc.Col([html.Div(html.Img(src="/video_stream", style={"width": "100%", "maxWidth": "640px", "height": "auto", "display": "block", "margin": "0 auto"}))]),
+        dbc.Col([html.Div(html.Img(src="/video_stream_Canny", style={"width": "100%", "maxWidth": "640px", "height": "auto", "display": "block", "margin": "0 auto"}))]),
+        dbc.Col([html.Div(html.Img(src="/video_stream_line", style={"width": "100%", "maxWidth": "640px", "height": "auto", "display": "block", "margin": "0 auto","marginTop": "100px"}))])
+    ]),
+    
     dbc.Row([
         dbc.Col(html.Div("Hallo", id="div-1"), width=12, className="text-center")
     ]),
 
-    # Video Row
-    dbc.Row([
-        dbc.Col(html.Div(
-            html.Img(src="/video_stream",
-                     style={"width": "100%", "maxWidth": "640px", "height": "auto",
-                            "display": "block", "margin": "0 auto"})
-        ), width=4),
-
-        dbc.Col(html.Div(
-            html.Img(src="/video_stream_Canny",
-                     style={"width": "100%", "maxWidth": "640px", "height": "auto",
-                            "display": "block", "margin": "0 auto"})
-        ), width=4),
-
-        dbc.Col(html.Div(
-            html.Img(src="/video_stream_line",
-                     style={"width": "100%", "maxWidth": "800px", "height": "auto",
-                            "display": "block", "margin": "0 auto"})
-        ), width=4),
-    ], justify="center", align="center"),
-
-    html.Br(),
-
-    # Sliders
     dbc.Row([
         dbc.Col([dcc.RangeSlider(id="h-slider", min=0, max=180,
                                  value=[config["lower_blue_input"][0], config["upper_blue_input"][0]])])
@@ -94,15 +78,71 @@ app.layout = html.Div([
 
     html.Hr(),
 
-    # Buttons
     dbc.Row([
-        dbc.Col([dbc.Button("Fahrmodus manual starten", id="btn-mode1", color="primary")]),
-        dbc.Col([dbc.Button("Fahrmodus CNN starten", id="btn-mode2", color="secondary")]),
-        dbc.Col([dbc.Button("Daten speichern", id="btn-save", color="success")])
-    ], justify="center"),
+        dbc.Col([dbc.Button("Fahrt starten", id="btn-mode1", color="primary")]),
+        dbc.Col([dbc.Button("Fahrt stoppen", id="btn-mode2", color="danger")]),
+        dbc.Col([dbc.Button("Daten speichern", id="btn-save", color="success")]),
+        dbc.Col([dbc.Switch(id="switch-armed", label="Motor Armed", value=False)]),
+        dbc.Col([dbc.Switch(id="switch-Calc", label="CNN Calc", value=False)])
+    ]),
 
-    html.Div(id="status-text", style={"marginTop": "20px", "fontWeight": "bold", "textAlign": "center"})
-])
+    html.Hr(),
+
+    # --------------------------
+    # Status Cards
+    # --------------------------
+    dbc.Row([
+        dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    html.H5("Motor Status", className="card-title"),
+                    html.Div(id="status-motor", className="card-text")
+                ])
+            ], id="card-motor", color="danger", inverse=True)
+        ], width=3),
+
+        dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    html.H5("CNN Calc Status", className="card-title"),
+                    html.Div(id="status-cnn", className="card-text")
+                ])
+            ], id="card-cnn", color="danger", inverse=True)
+        ], width=3)
+    ], justify="center", className="mt-3"),
+    
+        # ---------------- Bild ----------------
+    html.Hr(),
+        
+    dbc.Row([
+            html.H3("Pi Car Gruppe 2", 
+            style={
+                    "textAlign": "center",  # zentrierter Text
+                    "color": "#00FFFF",    # Textfarbe (Cyan)
+                    "fontFamily": "Arial", # Schriftart
+                    "fontSize": "36px",    # Schriftgröße
+                    "fontWeight": "bold",  # Fettdruck
+                    "textShadow": "2px 2px 4px #000000", # Schatteneffekt
+                    "display": "block",     # damit margin greift
+                    "marginLeft": "auto",   # automatische Ränder
+                    "marginRight": "auto",
+                    "marginTop": "20px"
+    }),
+            
+        # Bild aus assets/ laden
+        html.Img(
+    src="/assets/logo.png",
+    style={
+        "width": "400px",       # Bildbreite (z.B. doppelt so groß wie vorher)
+        "display": "block",     # damit margin greift
+        "marginLeft": "auto",   # automatische Ränder
+        "marginRight": "auto",
+        "marginTop": "20px"
+    }
+)]),    
+    
+], fluid=True)
+
 # --------------------------
 # Slider Callback
 # --------------------------
@@ -121,10 +161,37 @@ def update_div_1(h_input, s_input, v_input):
     return f"H: {h_input} | S: {s_input} | V: {v_input}"
 
 # --------------------------
-# Button Callback (Dash 2.9 kompatibel)
+# Motor Armed / CNN Calc Switches
 # --------------------------
 @app.callback(
-    Output("status-text", "children"),
+    [Output("status-motor", "children"),
+     Output("card-motor", "color")],
+    Input("switch-armed", "value"),
+    prevent_initial_call=True
+)
+def toggle_motor(armed):
+    proc.is_driving = armed
+    if not armed:
+        proc.stop()
+    return ("✅ Armed" if armed else "⛔ Unarmed",
+            "success" if armed else "danger")
+
+@app.callback(
+    [Output("status-cnn", "children"),
+     Output("card-cnn", "color")],
+    Input("switch-Calc", "value"),
+    prevent_initial_call=True
+)
+def toggle_cnn(active):
+    proc.CNN_active = active
+    return ("✅ Active" if active else "⛔ Inactive",
+            "success" if active else "danger")
+
+# --------------------------
+# Buttons
+# --------------------------
+@app.callback(
+    Output("status-motor", "children", allow_duplicate=True),
     Input("btn-mode1", "n_clicks"),
     Input("btn-mode2", "n_clicks"),
     Input("btn-save", "n_clicks"),
@@ -135,35 +202,38 @@ def update_div_1(h_input, s_input, v_input):
 )
 def handle_buttons(mode1_clicks, mode2_clicks, save_clicks, h_val, s_val, v_val):
     ctx = callback_context
-
     if not ctx.triggered:
-        return ""
+        return no_update
 
     button_id = ctx.triggered[0]['prop_id'].split('.')[0]
 
     if button_id == "btn-mode1":
-        proc.start_mode(1)  # Muss in CameraCar implementiert sein
-        return "Fahrmodus manual gestartet!"
+        if not proc.is_driving:
+            return "⚠️ Motor ist Unarmed!"
+        proc.start_mode(1)
+        return "✅ Running"
 
     elif button_id == "btn-mode2":
-        proc.start_mode(2)
-        return "Fahrmodus CNN gestartet!"
+        proc.stop()
+        proc.is_driving = False
+        return "⛔ Stopped"
 
     elif button_id == "btn-save":
         h_low, h_up = h_val
         s_low, s_up = s_val
         v_low, v_up = v_val
+        proc.lower_blue_input = np.array([h_low, s_low, v_low])
+        proc.upper_blue_input = np.array([h_up, s_up, v_up])
 
-        data = load_config()
-        data["lower_blue_input"] = [h_low, s_low, v_low]
-        data["upper_blue_input"] = [h_up, s_up, v_up]
-
+        data = {
+            "lower_blue_input": proc.lower_blue_input.tolist(),
+            "upper_blue_input": proc.upper_blue_input.tolist()
+        }
         with open("config.json", "w") as f:
             json.dump(data, f, indent=4)
+        return "⚙️ Config gespeichert"
 
-        return f"Daten gespeichert: lower={data['lower_blue_input']}, upper={data['upper_blue_input']}"
-
-    return ""
+    return no_update
 
 # --------------------------
 # Video Streams
@@ -172,11 +242,11 @@ def handle_buttons(mode1_clicks, mode2_clicks, save_clicks, h_val, s_val, v_val)
 def video_stream():
     return Response(proc.video_streams(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-@server.route("/video_stream_Canny") # This is not so useful
+@server.route("/video_stream_Canny")
 def video_stream_Canny():
     return Response(proc.video_streams_Canny(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-@server.route("/video_stream_line") # I need this one bigger
+@server.route("/video_stream_line")
 def video_streams_lines():
     return Response(proc.video_streams_lines(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
