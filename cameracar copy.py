@@ -118,7 +118,7 @@ class CameraCar(BaseCar):
                 alpha2 = np.degrees(alpha2)
                 #print(f"Alpha2 {alpha2}")
             else:
-                alpha2 = 60 # muss noch überprüft werden
+                alpha2 = 70 # muss noch überprüft werden
         elif len(rechts) >= 2:
             rdurch = np.mean(rechts, axis=0, keepdims=False) #muss noch parameter angepasst werden
             #(rechts[0] + rechts[1])/2
@@ -128,10 +128,10 @@ class CameraCar(BaseCar):
                 alpha2 = np.degrees(alpha2)
                 #print(f"Alpha2 {alpha2}")
             else:
-                alpha2 = 60 # muss noch überprüft werden
+                alpha2 = 70 # muss noch überprüft werden
         else:
             #print("no right lane")
-            alpha2 = 60 # muss noch überprüft werden
+            alpha2 = 70 # muss noch überprüft werden
 
         #mit einer linie probieren
         if len(links) == 1:
@@ -143,7 +143,7 @@ class CameraCar(BaseCar):
             #print(f"Alpha {alpha}")
             else:
             #print("no left lane")
-                alpha = 60 # muss noch überprüft werden
+                alpha = 55 # muss noch überprüft werden
         elif len(links) >= 2:
             ldurch = np.mean(links, axis=0, keepdims=False)
             if ldurch[2]-ldurch[0] != 0:
@@ -152,10 +152,10 @@ class CameraCar(BaseCar):
             #print(f"Alpha {alpha}")
             else:
             #print("no left lane")
-                alpha = 60 # muss noch überprüft werden
+                alpha = 55 # muss noch überprüft werden
         else:
             #print("no left lane")
-            alpha = 60 # muss noch überprüft werden
+            alpha = 55 # muss noch überprüft werden
 
         # Berechnung des Lenkwinkels
         # if alpha < 0:
