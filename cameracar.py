@@ -23,7 +23,7 @@ class CameraCar(BaseCar):
         self.canny = np.zeros_like(self.frame)[:,:,0]
         self.is_driving = False
         self.CNN_active = False
-        self.angle_calc_CNN_ini("/home/pi/Desktop/git/C2C_PP_02/live_model_Jan_fp32.tflite")
+        self.angle_calc_CNN_ini("/home/pi/Camp2Code/C2C-PP02/C2C_PP_02/live_model_Vic_fp32.tflite")  #Victor's folder, to change it ;)
         # upper_blue_input in die init für die slider bei Dash // funktionen anpassen auf self. upper
         # lower_blue_input in die init für die slider bei Dash
         print("CameraCar erzeugt")
@@ -245,7 +245,9 @@ class CameraCar(BaseCar):
     def video_streams_lines(self): 
         upper_boundary = 40
         while True: 
-            video_line = self.frame.copy()[upper_boundary:90, :, :] #40:90 und 20:150 als variablen oder einstellbar
+            video_line_CNN = self.frame.copy() #40:90 und 20:150 als variablen oder einstellbar
+            video_line_CNN = cv2.cvtColor(video_line_CNN, cv2.COLOR_BGR2RGB)
+            video_line = video_line_CNN.copy()[upper_boundary:90, :, :] #40:90 und 20:150 als variablen oder einstellbar
             # video_hsv = cv2.cvtColor(video_cropped,cv2.COLOR_BGR2HSV)
             # lower_blue = self.lower_blue_input
             # upper_blue = self.upper_blue_input
@@ -253,7 +255,7 @@ class CameraCar(BaseCar):
             # video_edges = cv2.Canny(video_filtered, 50, 100)
             lines = cv2.HoughLinesP(self.canny[upper_boundary:90,:],  1, np.pi / 180, threshold=30, minLineLength=20, maxLineGap=10)
             if self.CNN_active:
-                img = video_line
+                img = video_line_CNN
                 img = cv2.resize(img, (128, 128)).astype(np.float32)/255
                 img = np.expand_dims(img, axis=0)
                 angel = self.angle_calc_CNN(img)
