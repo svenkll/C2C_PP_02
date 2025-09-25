@@ -258,9 +258,11 @@ class CameraCar(BaseCar):
                 img = np.expand_dims(img, axis=0)
                 angel = self.angle_calc_CNN(img)
                 self.steering_angle = angel
+                print("CNN: ", angel)
             else:
                 angel = self.angle_calc(lines)
                 self.steering_angle = angel
+                print("Angle Calc: ", angel)
             #print("IM STREAM: ", self.steering_angle, angel)
             video_line = cv2.putText(video_line, str(angel), (10,20), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
             if lines is not None:
@@ -291,13 +293,14 @@ class CameraCar(BaseCar):
 # funktioniert noch nicht
     def _modus1(self):
         self.farb_config()
-        #self.drive(30, 90)
-        print("Vor der Schleife")
-        while self.is_driving:
-            print("In der Schleife: ", self.steering_angle)
+        print("Die Fhrt beginnt")
+        self.drive(30, 90)
+        # print("Vor der Schleife")
+        # while self.is_driving:
+            # print("In der Schleife: ", self.steering_angle)
             #self.drive(new_angle=self.steering_angle)
-            self.save_picture(self.frame, self.steering_angle)
-            time.sleep(0.2)
+            # self.save_picture(self.frame, self.steering_angle)
+            # time.sleep(0.2)
 
         self.stop()
         print("Die Fahrt ist beendet")

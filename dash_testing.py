@@ -1,4 +1,4 @@
-from dash import Dash, html, dcc, Input, Output, State, callback_context
+from dash import Dash, html, dcc, Input, Output, State, callback_context, no_update
 import dash_bootstrap_components as dbc
 from flask import Flask, Response
 import json
@@ -203,19 +203,19 @@ def toggle_cnn(active):
 def handle_buttons(mode1_clicks, mode2_clicks, save_clicks, h_val, s_val, v_val):
     ctx = callback_context
     if not ctx.triggered:
-        return dash.no_update
+        return no_update
 
     button_id = ctx.triggered[0]['prop_id'].split('.')[0]
 
     if button_id == "btn-mode1":
-        if not proc.motor_armed:
+        if not proc.is_driving:
             return "⚠️ Motor ist Unarmed!"
         proc.start_mode(1)
-        return "✅ Manual Mode Running"
+        return "✅ Running"
 
     elif button_id == "btn-mode2":
         proc.stop()
-        proc.motor_armed = False
+        proc.is_driving = False
         return "⛔ Stopped"
 
     elif button_id == "btn-save":
@@ -233,7 +233,7 @@ def handle_buttons(mode1_clicks, mode2_clicks, save_clicks, h_val, s_val, v_val)
             json.dump(data, f, indent=4)
         return "⚙️ Config gespeichert"
 
-    return dash.no_update
+    return no_update
 
 # --------------------------
 # Video Streams
